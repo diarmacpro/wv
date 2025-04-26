@@ -219,11 +219,11 @@
       })
 
       function showSpinner() {
-        console.log("showSpinner called!");
+        // console.log("showSpinner called!");
         const el = document.getElementById("loadingDoneX");
         if (el) {
           el.classList.remove("hidden");
-          console.log("Spinner is shown.");
+          // console.log("Spinner is shown.");
         } else {
           console.warn("Spinner element not found!");
         }
@@ -308,7 +308,7 @@
               acc[k] = highlightText(item[k] || '?', keywords);
               return acc;
             }, {});
-            console.log(item);
+            // console.log(item);
             return `<div class="relative ${getClass()} border rounded-xl shadow-sm p-3 transition-all duration-200 border hover:shadow-md"
               data-count="${item.cO}" data-ge="${item.ge}" data-idky="${item.ky}" data-key="${key}">
               <div class="text-gray-800 mb-2 flex justify-between">
@@ -469,12 +469,12 @@
           $(document).ready(() => {
 
             fetchAndCacheData(fbsB,'ms/data','https://cdn.weva.my.id/apix/data/dtStGrA',(d)=>{
-              console.log(d);
+              // console.log(d);
               dataGrosir = d;
             })
 
             fetchAndCacheData(fbsB,'ms/layer2','https://cdn.weva.my.id/apix/layer2A',(d)=>{
-              console.log(d);
+              // console.log(d);
               dataLayer2 = d;
             })
 
