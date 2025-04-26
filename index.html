@@ -11,6 +11,44 @@
       font-family: 'Inter', sans-serif;
     }
   </style>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Kumpulan Aplikasi</title>
+
+    <!-- SEO -->
+    <meta name="description" content="Dashboard interaktif berisi kumpulan aplikasi penting seperti monitoring gudang dan permintaan toko. Mudah diakses dan responsif.">
+
+    <!-- Open Graph (Facebook, LinkedIn, WhatsApp, dll) -->
+    <meta property="og:title" content="Dashboard Kumpulan Aplikasi">
+    <meta property="og:description" content="Dashboard interaktif berisi kumpulan aplikasi penting seperti monitoring gudang dan permintaan toko.">
+    <meta property="og:image" content="https://yourdomain.com/images/dashboard-thumbnail.jpg">
+    <meta property="og:url" content="https://yourdomain.com/dashboard">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Kumpulan Aplikasi">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Dashboard Kumpulan Aplikasi">
+    <meta name="twitter:description" content="Akses cepat ke berbagai aplikasi seperti monitoring permintaan gudang, request toko, dan lainnya.">
+    <meta name="twitter:image" content="https://yourdomain.com/images/dashboard-thumbnail.jpg">
+    <meta name="twitter:url" content="https://yourdomain.com/dashboard">
+
+    <!-- Favicon -->
+    <link rel="icon" href="https://yourdomain.com/favicon.ico" type="image/x-icon" />
+
+    <!-- Tailwind & Alpine.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <!-- Font (optional) -->
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+    </style>
+  </head>
+
 </head>
 <body class="bg-gray-100 text-gray-800">
 
@@ -59,42 +97,6 @@
               modified: '2025-04-26 [09:55]',
               url: './toko-req-ke-gudang'
             },
-            // {
-            //   title: 'Alpine.js Guide',
-            //   description: 'Lightweight JavaScript framework for interactivity.',
-            //   image: 'https://source.unsplash.com/400x300/?javascript,code',
-            //   modified: '2025-04-20',
-            //   url: 'https://alpinejs.dev/start-here'
-            // },
-            // {
-            //   title: 'Free Images',
-            //   description: 'Explore high quality royalty-free images.',
-            //   image: 'https://source.unsplash.com/400x300/?nature,free',
-            //   modified: '2025-03-30',
-            //   url: 'https://unsplash.com/'
-            // },
-            // {
-            //   title: 'GitHub',
-            //   description: 'Your code hub in the cloud.',
-            //   image: 'https://source.unsplash.com/400x300/?github,code',
-            //   modified: '2025-04-10',
-            //   url: 'https://github.com'
-            // },
-            // {
-            //   title: 'Figma',
-            //   description: 'Design UI collaboratively in real-time.',
-            //   image: 'https://source.unsplash.com/400x300/?design,uiux',
-            //   modified: '2025-04-18',
-            //   url: 'https://figma.com'
-            // },
-            // {
-            //   title: 'YouTube Dev',
-            //   description: 'Tutorials and dev content on YouTube.',
-            //   image: 'https://source.unsplash.com/400x300/?youtube,programming',
-            //   modified: '2025-04-12',
-            //   url: 'https://youtube.com'
-            // }
-            // Tambahkan lebih banyak card di sini sesuai kebutuhan
           ];
         },
         get filteredCards() {
