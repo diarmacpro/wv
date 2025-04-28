@@ -16,6 +16,7 @@
     <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@4849b7e3a19e88b14d27454f60d16c062e16648d/core.js" integrity="sha256-xxU8WD/MI8uoZ1geRPVqbSvo6MuHLOUHfu/0Vg8Bewg=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@f52d4e44b5e1b0405705bf4555d9fc6a3558ae61/firebase-olah-data/f.o.d_v.0.1.js" integrity="sha256-zWulae3cn5J3A+XOHBtvtBUR7ZWYCl49OslL4exrlyQ=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.9.0/dist/axios.min.js" integrity="sha256-zKmDh+GEVvPxPFFi3MzpYO1/ZsLgeJ1sFSz2oSvBG6Y=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
       .scroll-area::-webkit-scrollbar {
       width: 6px;
@@ -130,23 +131,50 @@
     </div>
 
     <!-- Modal -->
-    <div id="listIdStockByKain" class="fixed inset-0 z-50 hidden bg-black bg-opacity-50 backdrop-blur-sm flex items-start justify-center overflow-auto">
-    <div class="relative w-full h-full">
+    <div id="listIdStockByKain" class="fixed hidden inset-0 z-50 bg-opacity-60 bg-black flex items-start justify-center overflow-auto">
+    <div class="relative w-2/5 h-full">
       <!-- Konten Modal -->
-      <div class="w-full h-full bg-white bg-opacity-10 backdrop-blur-md text-white p-5">
+      <div class="w-full h-full bg-white text-black p-5">
         <!-- Header -->
         <div class="text-2xl font-semibold mb-4 border-b border-white/20 pb-2 flex justify-between">
           <h3 id="title_layer_id_stock"></h3>
-          <button onclick="hideModalListIdStock()" class="absolute top-4 right-4 text-white text-2xl font-bold z-50 hover:text-gray-300">&times;</button>
+          <button onclick="hideModalListIdStock()" class="absolute top-4 right-4 text-black text-2xl font-bold z-50 hover:text-gray-300">&times;</button>
         </div>
 
         <!-- Body -->
-        <div id="wadah_id_stock"></div>
+        <div id="wadah_id_stock" class="text-black">
+          <!-- Search & Reload -->
+          <div class="flex items-center gap-2 mb-4">
+            <input id="searchInput" type="text" placeholder="Cari rak, kol, lot..." class="w-full max-w-xl p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" />
+            <!-- form-input px-3 py-2 border rounded w-full max-w-sm shadow-sm focus:ring focus:ring-blue-300 -->
+            <button id="reloadBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-sm font-bold">
+              <i class="bi bi-arrow-clockwise"></i> Reload
+            </button>
+          </div>
+
+          <!-- Segmen Gudang -->
+          <div class="mb-6">
+            <h2 class="text-lg font-semibold mb-2"><i class="text-blue-500 bi bi-box-seam-fill"></i> Gudang (Rak 300–318)</h2>
+            <div id="gudangSegment" class="overflow-y-scroll overflow-x-hidden border rounded bg-white shadow-sm" style="min-height:36px;max-height:300px;">
+              <!-- Item akan dimasukkan lewat JS -->
+            </div>
+          </div>
+
+          <!-- Segmen Toko -->
+          <div>
+            <h2 class="text-lg font-semibold mb-2"><i class="text-blue-500 bi bi-buildings-fill"></i> Toko (Rak Lainnya)</h2>
+            <div id="tokoSegment" class="overflow-y-scroll overflow-x-hidden border rounded bg-white shadow-sm" style="min-height:36px;max-height:300px;">
+              <!-- Item akan dimasukkan lewat JS -->
+            </div>
+          </div>          
+        </div>
       </div>
     </div>
     </div>
 
     <script>
+     var keyAktif;
+     var rawData = [];
      function textCapitalize(str) {
        return str.replace(/\b\w/g, c => c.toUpperCase());
      }
@@ -159,13 +187,23 @@
       return _.filter(dataLayer2, i => i.id_kain == idKain);
      }
 
-     function showModalListIdStock(data) {
+     function showModalListIdStock(key,id) {
+      keyAktif = key;
+      // console.log(key);
+      // console.log(id);
+      const data = parseInt(id,10);
+      rawData = searchData(dataLayer2,data);
+      renderData(rawData);
       $('#title_layer_id_stock').html(textCapitalize(fDtGrs(341)[0].k));
-      console.log(data);
+      // console.log(data);
+      // console.log(typeof data);
+      
+      // console.log();
       $('#listIdStockByKain').removeClass('hidden');
      }
 
      function hideModalListIdStock() {
+       keyAktif = undefined;
        $('#listIdStockByKain').addClass('hidden');
      }
     </script>
@@ -260,11 +298,26 @@
         });
       }
 
-      function searchData(data, idKain) {
+      function searchId(data, idStock) {
+        // console.log(typeof idKain);
           return Object.values(data).filter(item => {
               const isRakInRange = item.rak >= 300 && item.rak <= 318;
-              const isIdKainMatch = item.id_kain === idKain;
+              const isIdKainMatch = item.id_stock === idStock;
               return isRakInRange && isIdKainMatch;
+          });
+      }
+
+      function searchData(data, idKain) {
+        // console.log(typeof idKain);
+          // return Object.values(data).filter(item => {
+          //     const isRakInRange = item.rak >= 300 && item.rak <= 318;
+          //     const isIdKainMatch = item.id_kain === idKain;
+          //     return isRakInRange && isIdKainMatch;
+          // });
+          return Object.values(data).filter(item => {
+              // const isRakInRange = item.rak >= 300 && item.rak <= 318;
+              const isIdKainMatch = item.id_kain === idKain;
+              return isIdKainMatch;
           });
       }
 
@@ -308,29 +361,30 @@
               acc[k] = highlightText(item[k] || '?', keywords);
               return acc;
             }, {});
+            
+            const picWh = item.change_pic ? `&nbsp;&nbsp;<i class="bi bi-arrow-right"></i>&nbsp;&nbsp;<span class="px-1 py-0 border-red-400 bg-red-100 rounded-lg text-sm text-gray-700 border">${item.change_pic}</span>` : '';
             // console.log(item);
             return `<div class="relative ${getClass()} border rounded-xl shadow-sm p-3 transition-all duration-200 border hover:shadow-md"
               data-count="${item.cO}" data-ge="${item.ge}" data-idky="${item.ky}" data-key="${key}">
               <div class="text-gray-800 mb-2 flex justify-between">
                 <div>
                   <span class="font-bold">${fields.idStock} (${fields.ltrl})</span>
-                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border">${fields.mkt}</span>
+                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border">${fields.mkt}</span>${picWh}
                 </div>
                 <div class="py-0 text-sm text-gray-800">${formatDate(item.dt_m || item.dt_c || Date.now())}</div>
               </div>
               <div class="text-gray-800 mb-2 flex justify-between">
                 <div class="text-gray-500">${fields.k}</div>
-                <button class="px-1 py-0 bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 rounded-lg text-sm font-medium border transition ${item.done === 1 ? 'hidden' : ''}" onclick="showModalListIdStock('${item.idKain}')">
-                  Ganti Id
+                <button class="px-1 py-0 rounded-lg text-sm font-medium border transition ${item.done === 1 ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100' : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'}" onclick="${item.done === 1 ? '' : `showModalListIdStock('${encodeURIComponent(key)}', '${encodeURIComponent(item.idKain)}')`}">
+                ${item.done === 1 ? 'Hapus' : `Ganti Id`}
                 </button>
               </div>
               <div class="flex justify-between">
                 <div class="flex flex-wrap gap-1">
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border">${fields.rkkl}</span>
-                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-mono font-medium text-gray-700 border">SJ.${padZero(item.idSj || 0, 5)}</span>
+                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-mono font-medium text-gray-700 border">${item.idSj ? `SJ.${padZero(item.idSj || 0, 5)}` : fields.ltrl }</span>
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border capitalize">${fields.ge}</span>
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 border">Qty. ${item.q || '?'}</span>
-                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border capitalize">${item.cO}</span>
                 </div>
                 <button class="px-1 py-0 ${item.done === 1 ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100' : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'} rounded-lg text-sm font-medium border transition"
                   onclick="setDoneStatus('${key}', ${item.done === 1 ? 0 : 1})">
@@ -340,6 +394,7 @@
             </div>`;
           };
       
+          // <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border capitalize">${item.cO}</span>
 
           const setDoneStatus = (key, status) => {
             if (!key) return;
@@ -357,9 +412,11 @@
           };
       
           const renderAllData = () => {
+            console.log(allData);
             const keywords = lastSearch.toLowerCase().split(/\s+/).filter(Boolean);
             const filtered = allData.filter(item => {
-              const isNotDone = item.done !== 1;
+              // const isNotDone = item.done !== 1 && item.done !== 2 && item.done !== 3;
+              const isNotDone = item.done == 0;
               const cO = parseInt(item.cO) || 0;
               const geCondition = cO === 0;
               const rak = getRakFromRkkl(item.rkkl);
@@ -419,6 +476,7 @@
             // Hasil akhirnya berupa array
             return Array.from(stockMap.values());
           }
+
           $(document).ready(() => {
             alertAudio.play().catch(() => console.warn('Audio tidak bisa autoplay, akan dipicu oleh interaksi user.'));
             $('#searchBox').focus();
@@ -426,13 +484,22 @@
 
             fbsA.gDtOn('sj-log', snapshot => {
               const data = snapshot.val();
+              console.log(data);
               const newKeys = data ? Object.keys(data) : [];
               const isNew = lastKeySnapshot.length > 0 && newKeys.length > lastKeySnapshot.length;
               lastKeySnapshot = newKeys;
-              allData = filterUniqueStock(data ? Object.entries(data).map(([key, val]) => ({
+
+              // allData = filterUniqueStock(data ? Object.entries(data).map(([key, val]) => ({
+              //   key,
+              //   ...val
+              // })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) : []);
+
+              allData = data ? Object.entries(data).map(([key, val]) => ({
                 key,
                 ...val
-              })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) : []);
+              })).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0)) : [];
+              
+              // console.log(allData);
               renderAllData();
               if (isNew) alertAudio.play();
             });
@@ -501,5 +568,158 @@
         <button id="allowAudioBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow"> Izinkan </button>
       </div>
     </div>
+  <!-- Script Logic -->
+    <script>
+      // const rawData = [
+      //   { "id_kain": 341, "id_rtr": "?", "id_stock": 3987, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 64, "stts": "g" },
+      //   { "id_kain": 341, "id_rtr": "?", "id_stock": 3988, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 63, "stts": "g" },
+      //   { "id_kain": 341, "id_rtr": "?", "id_stock": 3983, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 72, "stts": "g" },
+      //   { "id_kain": 341, "id_rtr": "?", "id_stock": 3971, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 83, "stts": "g" },
+      //   { "id_kain": 341, "id_rtr": "?", "id_stock": 3972, "kol": "C", "lot": "24", "q": "109.30", "rak": "041", "rol": 84, "stts": "g" },
+      //   { "id_kain": 341, "id_rtr": "?", "id_stock": 3978, "kol": "C", "lot": "24", "q": "109.30", "rak": "042", "rol": 87, "stts": "g" }
+      // ];
+
+      // Fungsi bantu untuk memproses data searchId
+      function pickSelectedFields(obj) {
+          const picked = _.pick(obj, ['id_stock', 'kol', 'lot', 'q', 'rak', 'rol']);
+          return {
+              idStock: String(picked.id_stock),
+              ltrl: `${picked.lot}#${picked.rol}`,
+              q: picked.q,
+              rkkl: `${picked.rak} ${picked.kol}`
+          };
+      }
+
+      function getModifiedData(key,id) {
+          return new Promise((resolve, reject) => {
+              fbsA.gDt(`sj-log/${key}`, '', (data, e) => {
+                  if (e) {
+                      reject(e);
+                      return;
+                  }
+
+                  // Misal dapatkan dari dataLayer2 dan id tertentu
+                  const searchResult = searchId(dataLayer2, id)[0];
+                  console.log(searchResult);
+                  const pickedData = pickSelectedFields(searchResult);
+                  
+                  console.log(pickedData);
+
+                  const modifiedData = {
+                      ...data,
+                      dt_m: stm(),
+                      idStock: _.toString(pickedData.idStock),
+                      ky: 0,
+                      ltrl: pickedData.ltrl,
+                      q: pickedData.q,
+                      rkkl: pickedData.rkkl,
+                      timestamp: Date.now(),
+                      change_pic: "WH Pic",
+                      key_old: key
+                  };
+
+                  resolve(modifiedData);
+              });
+          });
+      }
+
+      
+      function gantiId(id){
+        // console.log([id,keyAktif]);
+        getModifiedData(keyAktif,id)
+        .then(modified => {
+          fbsA.iDtKy('sj-log',modified,()=>{
+            fbsA.upd(`sj-log/${keyAktif}`, null, { done: 3 }, () => {
+                console.log('Update done berhasil!');
+                hideModalListIdStock();
+            });
+          });
+            // console.log(modified);
+        })
+        .catch(err => {
+            console.error('Error:', err);
+        });
+
+        // console.log(id);
+      }
+
+      function isRakGudang(rak) {
+        const rakNum = parseInt(rak, 10);
+        return rakNum >= 300 && rakNum <= 318;
+      }
+
+      function createBadge(label) {
+        return `<span class="text-[18px] inline-block bg-gray-100 text-gray-800 mr-1 mb-0 px-2 py-0 rounded-sm">${label}</span>`;
+      }
+
+      function createListItem(data) {
+        const text = `
+          ${createBadge(`${data.id_stock}`)}
+          ${createBadge(`${data.lot}#${data.rol}`)}
+          ${createBadge(`${data.rak} ${data.kol}`)}
+          ${createBadge(`${data.q}`)}
+          <span class="text-[18px] inline-block bg-gray-100 text-gray-800 mr-1 mb-0 px-2 py-0 rounded-sm text-green-600"><i class="bi bi-check-circle-fill"></i></span>
+        `;
+
+        return `
+          <button data-id="${data.id_stock}" onclick="gantiId(${data.id_stock})" class="list-item flex justify-between items-center w-full text-left p-1 border-b hover:bg-blue-50 focus:outline-none">
+            <div class="grid grid-cols-5 w-full gap-2">${text}</div>
+          </button>
+        `;
+      }
+
+      function renderData(data) {
+        // console.log("ASd");
+        // console.log(data);
+        const gudangEl = $('#gudangSegment').empty();
+        const tokoEl = $('#tokoSegment').empty();
+        const keyword = $('#searchInput').val().toLowerCase();
+
+        data.forEach(item => {
+          const allValues = `${item.id_stock} ${item.lot} ${item.rol} ${item.rak} ${item.kol} ${item.q}`.toLowerCase();
+          if (!allValues.includes(keyword)) return;
+
+          const html = createListItem(item);
+          if (isRakGudang(item.rak)) {
+            gudangEl.append(html);
+          } else {
+            tokoEl.append(html);
+          }
+        });
+
+        bindItemClick();
+      }
+
+      function bindItemClick() {
+        $('.list-item').off('click').on('click', function () {
+          $('.list-item').removeClass('bg-blue-100');
+          $(this).addClass('bg-blue-100');
+        });
+      }
+
+      $(document).ready(() => {
+        // renderData(rawData);
+
+        $('#searchInput').on('input', () => renderData(rawData));
+        $('#reloadBtn').on('click', () => {
+          $('#searchInput').val('');
+
+          const spinner = `
+            <div class="flex justify-center items-center py-4">
+              <div class="w-6 h-6 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+          `;
+
+          $('#gudangSegment').html(spinner);
+          $('#tokoSegment').html(spinner);
+          
+          setTimeout(() => {
+            renderData(rawData);
+          }, 300);
+        });
+
+      });
+    </script>
+    
   </body>
 </html>

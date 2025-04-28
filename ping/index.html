@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Performance Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+        }
+        .result {
+            margin-top: 1rem;
+            font-size: 1.2rem;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cek Performa Server</h1>
+    <div id="result" class="result">Mengukur...</div>
+
+    <script>
+        const startTime = performance.now();
+
+        window.onload = () => {
+            const loadTime = performance.now() - startTime;
+            document.getElementById('result').textContent = `Halaman dimuat dalam ${loadTime.toFixed(2)} ms`;
+
+            // Tambahan: Coba ping file kecil (opsional)
+            const img = new Image();
+            const pingStart = performance.now();
+            img.src = "ping.jpg?" + Math.random();
+            img.onload = () => {
+                const pingTime = performance.now() - pingStart;
+                const res = document.createElement('div');
+                res.textContent = `Ping gambar kecil: ${pingTime.toFixed(2)} ms`;
+                document.body.appendChild(res);
+            };
+            img.onerror = () => {
+                const res = document.createElement('div');
+                res.textContent = "Ping gagal.";
+                document.body.appendChild(res);
+            };
+        };
+    </script>
+</body>
+</html>
