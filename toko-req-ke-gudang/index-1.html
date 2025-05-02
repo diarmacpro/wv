@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DATA — Grosir</title>
+    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/628/628300.png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+    <style>
+      ::-webkit-scrollbar {
+        width: 3px;
+        height: 3px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #ddd;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      /* input[type=number] {
+        -moz-appearance: textfield;
+      } */
+    </style>
+  </head>
+  <body>
+    <!-- // buat supaya yang sudah ada di keranjang tidak dapat ditambahkan lagi -->
+    <div class="container-fluid py-3">
+      <h1 class="mb-3">Stock Grosir</h1>
+      <div class="mb-3 row g-2 align-items-center">
+        <div class="col-md-1">
+          <div id="stockSummary" class="d-flex justify-content-center align-items-center text-muted font-monospace">0000 of 0000</div>
+        </div>
+        <div class="col-auto">
+          <button id="modalListAccGudangBtn" class="btn btn-dark disabled">Acc Gudang</button>
+        </div>
+        <div class="col-md-3">
+          <input id="searchInput" type="text" class="form-control" placeholder="Pencarian Nama" />
+        </div>
+        <div class="col-md-1">
+          <input id="gdMin" type="number" class="form-control" placeholder="Gd Min" />
+        </div>
+        <div class="col-md-1">
+          <input id="gdMax" type="number" class="form-control" placeholder="Gd Max" />
+        </div>
+        <div class="col-md-1">
+          <input id="tkMin" type="number" class="form-control" placeholder="Tk Min" />
+        </div>
+        <div class="col-md-1">
+          <input id="tkMax" type="number" class="form-control" placeholder="Tk Max" />
+        </div>
+        <div class="col-auto">
+          <button id="btnSearch" class="btn btn-primary">Cari</button>
+        </div>
+        <div class="col-auto">
+          <button id="btnReset" class="btn btn-secondary">Reset</button>
+        </div>
+        <div class="col-auto">
+          <button id="btnCart" class="btn btn-success">Cart</button>
+        </div>
+        <div class="col-auto">
+          <button id="btnRenew" class="btn btn-danger">Re-New Data</button>
+        </div>
+      </div>
+      <div class="list-group overflow-scroll overflow-x-hidden" style="max-height:500px;">
+        <div class="list-group-item active">
+          <div class="row">
+            <div class="col-3">Id</div>
+            <div class="col-7">Nama</div>
+            <div class="col-1 text-center">Gudang</div>
+            <div class="col-1 text-center">Toko</div>
+          </div>
+        </div>
+      </div>
+      <div class="list-group overflow-scroll overflow-x-hidden" style="height:500px;max-height:500px;" id="stockListContainer"></div>
+    </div>
+
+    <div class="modal fade" id="layer2Modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Detail Kain</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="modalLayer2Content">
+            <div class="text-muted">Memuat data...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Cart -->
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body" id="cartContent">
+            <div class="text-muted">Memuat isi cart...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Cart -->
+    <div class="modal fade" id="modalListAccGudang" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">List Acc Gudang</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body p-0">
+            <div class="overflow-scroll overflow-x-hidden px-3 py-2 border" style="max-height:100px">
+              <input class="form-control form-control-lg rounded-0 shadow-none">
+            </div>            
+            <div id="listAccGudang" class="overflow-scroll overflow-x-hidden" style="max-height:500px"></div>
+            <!-- <div class="text-muted">Memuat isi cart...</div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.8.4/dist/axios.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@ed7e89566bc79c8846bcba6d8155536f98bab1e6/base62_0.0.0.1.js"></script> -->
+    <!-- <script src="./script.js"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@4849b7e3a19e88b14d27454f60d16c062e16648d/core.js" integrity="sha256-xxU8WD/MI8uoZ1geRPVqbSvo6MuHLOUHfu/0Vg8Bewg=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@f52d4e44b5e1b0405705bf4555d9fc6a3558ae61/firebase-olah-data/f.o.d_v.0.1.js" integrity="sha256-zWulae3cn5J3A+XOHBtvtBUR7ZWYCl49OslL4exrlyQ=" crossorigin="anonymous"></script>
+
+    <script type="module">
+      import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+      import {
+        getDatabase, ref, set, get, update, push,
+        query, remove, orderByChild, equalTo,
+        onValue, off
+      } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js';
+
+      const app = initializeApp({
+        apiKey: 'AIzaSyA6bsGsF_0zbb24zR3SPnoSxtv1uM-8_iA',
+        authDomain: 'main-stock-wv.firebaseapp.com',
+        databaseURL: 'https://main-stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app',
+        projectId: 'main-stock-wv',
+        storageBucket: 'main-stock-wv.appspot.com',
+        messagingSenderId: '78765716904',
+        appId: '1:78765716904:web:fb0033e181ee6dc1ef599d',
+        measurementId: 'G-CWXCZV2LCF'
+      }, 'logApp');
+
+      const appLog = initializeApp({
+        apiKey: "AIzaSyDrDGh1YVtBBIdgNTMS9p_PY24uelBZx-w",
+        authDomain: "stock-wv.firebaseapp.com",
+        databaseURL: "https://stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "stock-wv",
+        storageBucket: "stock-wv.firebasestorage.app",
+        messagingSenderId: "463129964774",
+        appId: "1:463129964774:web:351332e003a5a88c434b27",
+        measurementId: "G-L8KRSPHTNN"
+      }, 'appLog');
+
+      const db = getDatabase(app);
+      const dbLog = getDatabase(appLog);
+
+      Object.assign(window, {
+        db, dbLog, ref, set, get, update, push,
+        query, remove, orderByChild, equalTo,
+        onValue, off
+      });
+    </script>
+
+    <script>
+      let fbsSvc, fbsSvcA, fbsSvcB, dataStockGroup = [], dataLayer2 = [];
+      var dataLog = [];
+
+      $(() => {
+        // fbsSvc = new Fbs(app);
+        fbsSvcA = new Fbs(db);
+        fbsSvcB = new Fbs(dbLog);
+        loadAllData();
+
+        $('#btnRenew').on('click', renewAllData);
+
+        $('#btnSearch').on('click', () => {
+          const keyword = $('#searchInput').val();
+          const gdMin = parseInt($('#gdMin').val(), 10);
+          const gdMax = parseInt($('#gdMax').val(), 10);
+          const tkMin = parseInt($('#tkMin').val(), 10);
+          const tkMax = parseInt($('#tkMax').val(), 10);
+
+          const rangeGd = [isNaN(gdMin) ? Number.MIN_SAFE_INTEGER : gdMin, isNaN(gdMax) ? Number.MAX_SAFE_INTEGER : gdMax];
+          const rangeTk = [isNaN(tkMin) ? Number.MIN_SAFE_INTEGER : tkMin, isNaN(tkMax) ? Number.MAX_SAFE_INTEGER : tkMax];
+
+          const filtered = filterDtStGr(rangeGd, rangeTk);
+          const finalResult = searchByK(keyword, filtered);
+          renderStockGroupList(finalResult);
+        });
+
+        let cachedFiltered = [];
+        const sjLogRef = ref(dbLog, 'sj-log');
+        off(sjLogRef); // hindari listener ganda
+
+        onValue(sjLogRef, (snapshot) => {
+          const data = snapshot.val();
+          dataLog = data;
+          console.log(dataLog);
+          $('#modalListAccGudangBtn').removeClass('disabled');
+        }, (error) => {
+          console.error('Gagal memuat sj-log:', error);
+          $('#cartContent').html('<div class="alert alert-danger">Gagal memuat data log.</div>');
+        });
+
+        // Trigger modal dari tombol
+        $('#btnCart').on('click', () => {
+          console.log(dataLog);
+          renderCart(dataLog);
+        });
+
+        function toReadableDate(input) {
+          // Cek apakah input sudah dalam format "YYYY-MM-DD HH:MM:SS"
+          const isFormatted = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(input);
+          if (isFormatted) return input;
+
+          const timestamp = parseInt(input, 10);
+          if (isNaN(timestamp)) return 'Invalid input';
+
+          const dt = new Date(timestamp);
+          const pad = n => String(n).padStart(2, '0');
+
+          const YYYY = dt.getFullYear();
+          const MM = pad(dt.getMonth() + 1);
+          const DD = pad(dt.getDate());
+          const HH = pad(dt.getHours());
+          const II = pad(dt.getMinutes());
+          const SS = pad(dt.getSeconds());
+
+          return `${YYYY}-${MM}-${DD} ${HH}:${II}:${SS}`;
+        }
+
+        $('#modalListAccGudangBtn').on('click',()=>{
+          console.log("Modal List Acc");
+          const dtAccWh = _.filter(dataLog,i=>i.done === 1 && i.mkt === 'Toko');
+          const listItem = dtAccWh.map(i=>{
+            return `<div class='list-group-item border-0'>
+              <div class="card shadow shadow-sm">
+                <div class="card-body p-2">
+                  <div class='row'>
+                    <div class='col'>
+                      <span class='fw-bold'>${i.idStock}</span> | <span class='text-capitalize text-muted small'>${i.k}</span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-5">
+                      <div class='row mb-1'>
+                        <div class='col'>
+                          <span class="p-2 badge text-bg-primary">${i.ltrl}</span>
+                          <span class="p-2 badge text-bg-primary">${i.rkkl}</span>
+                          <span class="p-2 badge text-bg-primary">${i.q}</span>
+                        </div>
+                      </div>
+                      <div class='row'>
+                        <div class='col'>
+                          <span class="p-2 badge text-bg-primary">${toReadableDate(i.dt_m)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-7"></div>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }).join('');
+
+          $('#listAccGudang').html(`<div class='list-group'>
+            ${listItem}
+          </div>`);
+          
+          new bootstrap.Modal(document.getElementById('modalListAccGudang')).show();
+        });
+      });
+
+      function renderCart(data){
+        const $cartContent = $('#cartContent');
+        if (!data) {
+          $cartContent.html('<div class="alert alert-warning">Tidak ada data pada sj-log.</div>');
+          cachedFiltered = [];
+          return;
+        }
+
+        cachedFiltered = Object.entries(data).filter(([key, item]) =>
+          item.mkt === 'Toko' && parseInt(item.done, 10) === 0
+        );
+
+        if (cachedFiltered.length === 0) {
+          $cartContent.html('<div class="alert alert-info">Tidak ada entri Toko dengan status done = 0.</div>');
+          return;
+        }
+
+        let html = '<div class="list-group">';
+        cachedFiltered.forEach(([key, item]) => {
+          html += `
+            <div class="list-group-item">
+              <div class="row">
+                <div class="col">
+                  <h3 class="card-title mb-1">${item.idStock} | <span class="text-capitalize">${item.k}</span></h3>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <div class="mb-1 small text-muted">${item.ltrl} | ${item.rkkl} | ${item.q}</div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col">
+                  <span class="text-end text-muted small">${new Date(item.timestamp).toLocaleString()}</span>
+                </div>
+                <div class="col">
+                  <button class="py-0 fw-bold btn btn-sm btn-outline-danger btnMarkDone" data-key="${key}">
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>`;
+        });
+        html += '</div>';
+        $cartContent.html(html);
+
+        // Re-attach handler setiap kali konten dimuat ulang
+        $('.btnMarkDone').on('click', function () {
+          const key = $(this).data('key');
+          const itemRef = ref(dbLog, `sj-log/${key}`);
+          update(itemRef, {
+            done: 1,
+            dt_m: Date.now()
+          }).then(() => {
+            $(this).closest('.list-group-item').remove();
+            // $(this).closest('.col').fadeOut(() => $(this).remove());
+          }).catch(err => {
+            alert('Gagal menandai sebagai done.');
+            console.error(err);
+          });
+        });
+
+        // $('#cartContent').html('<div class="text-muted">Memuat isi log Toko (Belum Done)...</div>');
+        new bootstrap.Modal(document.getElementById('cartModal')).show();
+      }
+
+      function fetchAndCacheData(path, fallbackUrl, onSuccess) {
+        fbsSvcA.gDt(path, null, (data) => {
+          if (data) {
+            onSuccess(data);
+          } else {
+            pR(fallbackUrl, {}, (err, res) => {
+              if (!err && res?.data) {
+                const result = res.data;
+                fbsSvcA.iDtKy(path, result, () => onSuccess(result));
+              }
+            });
+          }
+        });
+      }
+
+      function loadAllData() {
+        fetchAndCacheData('ms/data', 'https://cdn.weva.my.id/apix/data/dtStGrA', (data) => {
+          dataStockGroup = data;
+          const range = getMinMaxGdTk(data);
+          $('#gdMin').val(range.minGd);
+          $('#gdMax').val(range.maxGd);
+          $('#tkMin').val(range.minTk);
+          $('#tkMax').val(range.maxTk);
+          renderStockGroupList(data);
+        });
+
+        fetchAndCacheData('ms/layer2', 'https://cdn.weva.my.id/apix/layer2A', (data) => {
+          dataLayer2 = data;
+        });
+      }
+
+      function renewAllData() {
+        if (!confirm('Download ulang data terbaru dan timpa semua data di Firebase?')) return;
+
+        $('#btnRenew').prop('disabled', true).text('Memperbarui...');
+
+        pR('https://cdn.weva.my.id/apix/data/dtStGrA', '', (e1, d1) => {
+          if (e1 || !d1 || !d1.data) {
+            alert('Gagal mengambil data utama dari server.');
+            $('#btnRenew').prop('disabled', false).text('Re-New Data');
+            return;
+          }
+
+          const newData = d1.data;
+
+          pR('https://cdn.weva.my.id/apix/layer2A', '', (e2, d2) => {
+            if (e2 || !d2 || !d2.data) {
+              alert('Gagal mengambil data layer dari server.');
+              $('#btnRenew').prop('disabled', false).text('Re-New Data');
+              return;
+            }
+
+            const newLayer = d2.data;
+
+            Promise.all([
+              remove(ref(db, 'ms/data')),
+              remove(ref(db, 'ms/layer2'))
+            ]).then(() => {
+              fbsSvcA.iDtKy('ms/data', newData, () => {
+                fbsSvcA.iDtKy('ms/layer2', newLayer, () => {
+                  loadAllData();
+                  alert('Data berhasil diperbarui dari server.');
+                  $('#btnRenew').prop('disabled', false).text('Re-New Data');
+                });
+              });
+            }).catch((err) => {
+              console.error('Gagal menghapus data lama:', err);
+              alert('Gagal menghapus data lama.');
+              $('#btnRenew').prop('disabled', false).text('Re-New Data');
+            });
+          });
+        });
+      }
+
+      function renderStockGroupList(data) {
+        const listData = Array.isArray(data) ? data : Object.values(data);
+        const totalData = Array.isArray(dataStockGroup) ? dataStockGroup.length : Object.keys(dataStockGroup).length;
+        $('#stockSummary').text(`${listData.length} of ${totalData}`);
+
+        const sajian = listData.map((item) => {
+          const row = $(`
+            <div class="list-group-item list-group-item-action py-1" data-id_kain="${item.id_kain}">
+              <div class="row">
+                <div class="col-3"><strong>${item.id_kain}</strong></div>
+                <div class="col-7 text-capitalize">${item.k}</div>
+                <div class="col-1 text-center">${item.gd}</div>
+                <div class="col-1 text-center">${item.tk}</div>
+              </div>
+            </div>
+          `);
+          row.on('click', function () {
+            const idKain = $(this).data('id_kain');
+            const namaKain = $(this).find('.col-7').text().trim();
+            const jumlahGudang = $(this).find('.col-1:eq(0)').text().trim();
+            const jumlahToko = $(this).find('.col-1:eq(1)').text().trim();
+            showLayer2InModal(idKain, namaKain, jumlahGudang, jumlahToko);
+          });
+          return row;
+        });
+
+        $('#stockListContainer').html(sajian);
+      }
+
+      function filterDtStGr(rangeGd, rangeTk) {
+        const [minGd, maxGd] = rangeGd;
+        const [minTk, maxTk] = rangeTk;
+        const listData = Array.isArray(dataStockGroup) ? dataStockGroup : Object.values(dataStockGroup);
+        return listData.filter((item) => {
+          const gd = parseInt(item.gd, 10);
+          const tk = parseInt(item.tk, 10);
+          return gd >= minGd && gd <= maxGd && tk >= minTk && tk <= maxTk;
+        });
+      }
+
+      function searchByK(keyword, data = dataStockGroup) {
+        const tokens = keyword.toLowerCase().split(/\s+/);
+        const listData = Array.isArray(data) ? data : Object.values(data);
+        return listData.filter((item) => {
+          const fieldK = (item.k || '').toLowerCase();
+          return tokens.every((token) => fieldK.includes(token));
+        });
+      }
+
+      function getMinMaxGdTk(data) {
+        const list = Array.isArray(data) ? data : Object.values(data);
+        const gdValues = list.map((item) => parseInt(item.gd, 10));
+        const tkValues = list.map((item) => parseInt(item.tk, 10));
+        return {
+          minGd: Math.min(...gdValues),
+          maxGd: Math.max(...gdValues),
+          minTk: Math.min(...tkValues),
+          maxTk: Math.max(...tkValues)
+        };
+      }
+
+      function showLayer2InModal(idKain, namaKain, jumlahGudang, jumlahToko) {
+        const targetData = Array.isArray(dataLayer2) ? dataLayer2 : Object.values(dataLayer2);
+        const filtered = targetData.filter((item) => item.id_kain === idKain);
+
+        const isGudang = (rak) => parseInt(rak, 10) >= 300 && parseInt(rak, 10) <= 318;
+        const gudangItems = filtered.filter((item) => isGudang(item.rak));
+        const tokoItems = filtered.filter((item) => !isGudang(item.rak));
+
+        const renderGroup = (title, items) => {
+          if (items.length === 0) return `<div class="fw-bold text-danger">Tidak ada data untuk ${title}.</div>`;
+          return `<h6 class="mt-3">${title}</h6><ul class="list-group">` +
+            items.map(item => `
+              <li class="list-group-item d-flex justify-content-between align-items-center cartable-item" 
+                  data-id="${item.id_stock}"
+                  data-json='${JSON.stringify(item).replace(/'/g, '&apos;')}'
+                  data-kain="${namaKain}">
+                <div class="row w-100">
+                  <div class="col">${item.id_stock}</div>
+                  <div class="col">${item.lot} # ${item.rol}</div>
+                  <div class="col">${item.rak} ${item.kol}</div>
+                  <div class="col">${item.q}</div>
+                </div>
+              </li>`).join('') +
+            '</ul>';
+        };
+
+        const content = `${renderGroup('Rak Gudang', gudangItems)}${renderGroup('Rak Toko', tokoItems)}`;
+        const headerText = `[${idKain}] <span class='text-primary text-capitalize'>${namaKain}</span> [Gudang: ${jumlahGudang} — Toko: ${jumlahToko}]`;
+
+        $('#layer2Modal .modal-title').html(headerText);
+        $('#modalLayer2Content').html(content);
+
+        // Tambahkan logika cart setelah render selesai
+        fbsSvcA.gDt('ms/cart', null, (existingCart) => {
+          console.log("Abc");
+          const existingIds = existingCart ? Object.values(existingCart).map(x => x.id_stock) : [];
+
+          $('#modalLayer2Content .cartable-item').each(function () {
+            const id = $(this).data('id');
+            if (existingIds.includes(id)) {
+              $(this).addClass('bg-warning-subtle text-muted').css('pointer-events', 'none');
+            } else {
+              $(this).off('click').on('click', function () {
+                const item = JSON.parse($(this).attr('data-json').replace(/&apos;/g, `'`));
+                const timestamp = Date.now();
+
+                const data = {
+                  "cO": "0",
+                  "done": 0,
+                  "dt_c": stm(),
+                  "dt_m": stm(),
+                  "flow": 0,
+                  "ge": item.stts,
+                  "iMkt": "1",
+                  "idKain": item.id_kain.toString(),
+                  "idStock": item.id_stock.toString(),
+                  "k": $(this).data('kain'),
+                  "ky": 0,
+                  "ltrl": item.lot + "#" + item.rol,
+                  "mkt": "Toko",
+                  "q": item.q.toString(),
+                  "rkkl": item.rak + " " + item.kol,
+                  "timestamp": timestamp
+                };
+                const path = 'sj-log';
+                const dataRef = ref(dbLog, path);
+                const value = data;
+                (Array.isArray(value) ? value : [value]).forEach(v => set(push(dataRef), v));
+                $(this).removeClass('bg-light').addClass('bg-success text-white').css('pointer-events', 'none');
+
+              });
+            }
+          });
+        });
+
+        new bootstrap.Modal(document.getElementById('layer2Modal')).show();
+      }
+    </script>
+  </body>
+</html>

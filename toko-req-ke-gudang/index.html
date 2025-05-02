@@ -4,8 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>DATA — Grosir</title>
-    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/628/628300.png">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
+    <link
+      rel="icon"
+      href="https://cdn-icons-png.freepik.com/512/628/628300.png"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       ::-webkit-scrollbar {
         width: 3px;
@@ -23,335 +26,435 @@
         -webkit-appearance: none;
         margin: 0;
       }
-      input[type=number] {
-        -moz-appearance: textfield;
-      }
     </style>
   </head>
-  <body>
-    <!-- // buat supaya yang sudah ada di keranjang tidak dapat ditambahkan lagi -->
-    <div class="container-fluid py-3">
-      <h1 class="mb-3">Stock Grosir</h1>
-      <div class="mb-3 row g-2 align-items-center">
-        <div class="col-md-1">
-          <div id="stockSummary" class="d-flex justify-content-center align-items-center text-muted font-monospace">0000 of 0000</div>
-        </div>
-        <div class="col-auto">
-          <button id="modalListAccGudangBtn" class="btn btn-dark disabled">Acc Gudang</button>
-        </div>
-        <div class="col-md-3">
-          <input id="searchInput" type="text" class="form-control" placeholder="Pencarian Nama" />
-        </div>
-        <div class="col-md-1">
-          <input id="gdMin" type="number" class="form-control" placeholder="Gd Min" />
-        </div>
-        <div class="col-md-1">
-          <input id="gdMax" type="number" class="form-control" placeholder="Gd Max" />
-        </div>
-        <div class="col-md-1">
-          <input id="tkMin" type="number" class="form-control" placeholder="Tk Min" />
-        </div>
-        <div class="col-md-1">
-          <input id="tkMax" type="number" class="form-control" placeholder="Tk Max" />
-        </div>
-        <div class="col-auto">
-          <button id="btnSearch" class="btn btn-primary">Cari</button>
-        </div>
-        <div class="col-auto">
-          <button id="btnReset" class="btn btn-secondary">Reset</button>
-        </div>
-        <div class="col-auto">
-          <button id="btnCart" class="btn btn-success">Cart</button>
-        </div>
-        <div class="col-auto">
-          <button id="btnRenew" class="btn btn-danger">Re-New Data</button>
-        </div>
-      </div>
-      <div class="list-group overflow-scroll overflow-x-hidden" style="max-height:500px;">
-        <div class="list-group-item active">
-          <div class="row">
-            <div class="col-3">Id</div>
-            <div class="col-7">Nama</div>
-            <div class="col-1 text-center">Gudang</div>
-            <div class="col-1 text-center">Toko</div>
+  <body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-6">
+      <h1 class="text-3xl font-bold mb-6 text-gray-800">Stock Grosir</h1>
+      <div class="flex flex-wrap gap-3 items-center mb-6">
+        <div class="w-32">
+          <div id="stockSummary" class="text-sm text-gray-500 font-mono text-center">
+            0000 of 0000
           </div>
         </div>
+        <button id="modalListAccGudangBtn" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
+          Acc Gudang
+        </button>
+        <input
+          id="searchInput"
+          type="text"
+          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Pencarian ID/Nama (contoh: 24s com ken ku)"
+        />
+        <input
+          id="gdMin"
+          type="number"
+          class="w-24 px-4 py-2 border border-gray-300 rounded-lg"
+          placeholder="Gd Min"
+        />
+        <input
+          id="gdMax"
+          type="number"
+          class="w-24 px-4 py-2 border border-gray-300 rounded-lg"
+          placeholder="Gd Max"
+        />
+        <input
+          id="tkMin"
+          type="number"
+          class="w-24 px-4 py-2 border border-gray-300 rounded-lg"
+          placeholder="Tk Min"
+        />
+        <input
+          id="tkMax"
+          type="number"
+          class="w-24 px-4 py-2 border border-gray-300 rounded-lg"
+          placeholder="Tk Max"
+        />
+        <!-- <button id="btnSearch" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          Cari
+        </button> -->
+        <button id="btnReset" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
+          Reset
+        </button>
+        <button id="btnCart" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          Cart
+        </button>
+        <button id="btnRenew" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+          Re-New Data
+        </button>
       </div>
-      <div class="list-group overflow-scroll overflow-x-hidden" style="height:500px;max-height:500px;" id="stockListContainer"></div>
+      
+      <div class="bg-white rounded-lg shadow">
+        <div class="bg-gray-800 text-white p-3 rounded-t-lg">
+          <div class="grid grid-cols-12 gap-4">
+            <div class="col-span-3">Id</div>
+            <div class="col-span-7">Nama</div>
+            <div class="col-span-1 text-center">Gudang</div>
+            <div class="col-span-1 text-center">Toko</div>
+          </div>
+        </div>
+        <div id="stockListContainer" class="overflow-auto max-h-[500px]"></div>
+      </div>
     </div>
 
-    <div class="modal fade" id="layer2Modal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-fullscreen">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Detail Kain</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body" id="modalLayer2Content">
-            <div class="text-muted">Memuat data...</div>
+    <!-- Modal Layer 2 -->
+    <div id="layer2Modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl">
+            <div class="flex justify-between items-center p-4 border-b">
+              <h5 class="text-xl font-semibold">Detail Kain</h5>
+              <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('layer2Modal')">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div class="p-4" id="modalLayer2Content">
+              <div class="text-gray-500">Memuat data...</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Modal Cart -->
-    <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Cart</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body" id="cartContent">
-            <div class="text-muted">Memuat isi cart...</div>
+    <div id="cartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+            <div class="flex justify-between items-center p-4 border-b">
+              <h5 class="text-xl font-semibold">Cart</h5>
+              <div class="flex gap-2 items-center">
+                <input
+                  id="cartSearch"
+                  type="text"
+                  class="px-3 py-1 border border-gray-300 rounded-lg"
+                  placeholder="Cari di cart (ID, nama, lot, rak, qty)..."
+                />
+                <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('cartModal')">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="p-4" id="cartContent">
+              <div class="text-gray-500">Memuat isi cart...</div>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Modal Cart -->
-    <div class="modal fade" id="modalListAccGudang" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">List Acc Gudang</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body p-0">
-            <div class="overflow-scroll overflow-x-hidden px-3 py-2 border" style="max-height:100px">
-              <input class="form-control form-control-lg rounded-0 shadow-none">
-            </div>            
-            <div id="listAccGudang" class="overflow-scroll overflow-x-hidden" style="max-height:500px"></div>
-            <!-- <div class="text-muted">Memuat isi cart...</div> -->
+    <!-- Modal List Acc Gudang -->
+    <div id="modalListAccGudang" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+            <div class="flex justify-between items-center p-4 border-b">
+              <h5 class="text-xl font-semibold">List Acc Gudang</h5>
+              <div class="flex gap-2 items-center">
+                <input
+                  id="accGudangSearch"
+                  type="text"
+                  class="px-3 py-1 border border-gray-300 rounded-lg"
+                  placeholder="Cari acc gudang (ID, nama, lot, rak, qty)..."
+                />
+                <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('modalListAccGudang')">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="listAccGudang" class="p-4 overflow-auto max-h-[500px]"></div>
           </div>
         </div>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.8.4/dist/axios.min.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@ed7e89566bc79c8846bcba6d8155536f98bab1e6/base62_0.0.0.1.js"></script> -->
-    <!-- <script src="./script.js"></script> -->
-
-    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@4849b7e3a19e88b14d27454f60d16c062e16648d/core.js" integrity="sha256-xxU8WD/MI8uoZ1geRPVqbSvo6MuHLOUHfu/0Vg8Bewg=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@f52d4e44b5e1b0405705bf4555d9fc6a3558ae61/firebase-olah-data/f.o.d_v.0.1.js" integrity="sha256-zWulae3cn5J3A+XOHBtvtBUR7ZWYCl49OslL4exrlyQ=" crossorigin="anonymous"></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@4849b7e3a19e88b14d27454f60d16c062e16648d/core.js"
+      integrity="sha256-xxU8WD/MI8uoZ1geRPVqbSvo6MuHLOUHfu/0Vg8Bewg="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@f52d4e44b5e1b0405705bf4555d9fc6a3558ae61/firebase-olah-data/f.o.d_v.0.1.js"
+      integrity="sha256-zWulae3cn5J3A+XOHBtvtBUR7ZWYCl49OslL4exrlyQ="
+      crossorigin="anonymous"
+    ></script>
 
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
       import {
-        getDatabase, ref, set, get, update, push,
-        query, remove, orderByChild, equalTo,
-        onValue, off
+        getDatabase,
+        ref,
+        set,
+        get,
+        update,
+        push,
+        query,
+        remove,
+        orderByChild,
+        equalTo,
+        onValue,
+        off,
       } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js';
 
-      const app = initializeApp({
-        apiKey: 'AIzaSyA6bsGsF_0zbb24zR3SPnoSxtv1uM-8_iA',
-        authDomain: 'main-stock-wv.firebaseapp.com',
-        databaseURL: 'https://main-stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app',
-        projectId: 'main-stock-wv',
-        storageBucket: 'main-stock-wv.appspot.com',
-        messagingSenderId: '78765716904',
-        appId: '1:78765716904:web:fb0033e181ee6dc1ef599d',
-        measurementId: 'G-CWXCZV2LCF'
-      }, 'logApp');
+      const app = initializeApp(
+        {
+          apiKey: 'AIzaSyA6bsGsF_0zbb24zR3SPnoSxtv1uM-8_iA',
+          authDomain: 'main-stock-wv.firebaseapp.com',
+          databaseURL:
+            'https://main-stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app',
+          projectId: 'main-stock-wv',
+          storageBucket: 'main-stock-wv.appspot.com',
+          messagingSenderId: '78765716904',
+          appId: '1:78765716904:web:fb0033e181ee6dc1ef599d',
+          measurementId: 'G-CWXCZV2LCF',
+        },
+        'logApp'
+      );
 
-      const appLog = initializeApp({
-        apiKey: "AIzaSyDrDGh1YVtBBIdgNTMS9p_PY24uelBZx-w",
-        authDomain: "stock-wv.firebaseapp.com",
-        databaseURL: "https://stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app",
-        projectId: "stock-wv",
-        storageBucket: "stock-wv.firebasestorage.app",
-        messagingSenderId: "463129964774",
-        appId: "1:463129964774:web:351332e003a5a88c434b27",
-        measurementId: "G-L8KRSPHTNN"
-      }, 'appLog');
+      const appLog = initializeApp(
+        {
+          apiKey: 'AIzaSyDrDGh1YVtBBIdgNTMS9p_PY24uelBZx-w',
+          authDomain: 'stock-wv.firebaseapp.com',
+          databaseURL:
+            'https://stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app',
+          projectId: 'stock-wv',
+          storageBucket: 'stock-wv.firebasestorage.app',
+          messagingSenderId: '463129964774',
+          appId: '1:463129964774:web:351332e003a5a88c434b27',
+          measurementId: 'G-L8KRSPHTNN',
+        },
+        'appLog'
+      );
 
       const db = getDatabase(app);
       const dbLog = getDatabase(appLog);
 
       Object.assign(window, {
-        db, dbLog, ref, set, get, update, push,
-        query, remove, orderByChild, equalTo,
-        onValue, off
+        db,
+        dbLog,
+        ref,
+        set,
+        get,
+        update,
+        push,
+        query,
+        remove,
+        orderByChild,
+        equalTo,
+        onValue,
+        off,
       });
     </script>
 
     <script>
-      let fbsSvc, fbsSvcA, fbsSvcB, dataStockGroup = [], dataLayer2 = [];
+      let fbsSvc,
+        fbsSvcA,
+        fbsSvcB,
+        dataStockGroup = [],
+        dataLayer2 = [];
       var dataLog = [];
 
+      function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+      }
+
+      function openModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+      }
+
+      function matchesKeywords(text, keywords) {
+        if (!keywords) return true;
+        const searchTerms = keywords.toLowerCase().split(/\s+/);
+        return searchTerms.every(term => text.toLowerCase().includes(term));
+      }
+
       $(() => {
-        // fbsSvc = new Fbs(app);
         fbsSvcA = new Fbs(db);
         fbsSvcB = new Fbs(dbLog);
         loadAllData();
 
         $('#btnRenew').on('click', renewAllData);
 
-        $('#btnSearch').on('click', () => {
-          const keyword = $('#searchInput').val();
-          const gdMin = parseInt($('#gdMin').val(), 10);
-          const gdMax = parseInt($('#gdMax').val(), 10);
-          const tkMin = parseInt($('#tkMin').val(), 10);
-          const tkMax = parseInt($('#tkMax').val(), 10);
-
-          const rangeGd = [isNaN(gdMin) ? Number.MIN_SAFE_INTEGER : gdMin, isNaN(gdMax) ? Number.MAX_SAFE_INTEGER : gdMax];
-          const rangeTk = [isNaN(tkMin) ? Number.MIN_SAFE_INTEGER : tkMin, isNaN(tkMax) ? Number.MAX_SAFE_INTEGER : tkMax];
-
-          const filtered = filterDtStGr(rangeGd, rangeTk);
-          const finalResult = searchByK(keyword, filtered);
-          renderStockGroupList(finalResult);
+        // Enhanced search functionality
+        $('#searchInput').on('input', performSearch);
+        $('#gdMin, #gdMax, #tkMin, #tkMax').on('input', performSearch);
+        // $('#btnSearch').on('click', performSearch);
+        $('#btnReset').on('click', () => {
+          // $('#searchInput, #gdMin, #gdMax, #tkMin, #tkMax').val('');
+          loadAllData();
+          // renderStockGroupList(dataStockGroup);
         });
 
-        let cachedFiltered = [];
+        // Cart search
+        $('#cartSearch').on('input', function() {
+          const searchTerm = $(this).val();
+          $('.cart-item').each(function() {
+            const item = $(this);
+            const searchText = [
+              item.find('.item-id').text(),
+              item.find('.item-name').text(),
+              item.find('.item-details').text(),
+              item.find('.item-timestamp').text()
+            ].join(' ');
+            
+            $(this).toggle(matchesKeywords(searchText, searchTerm));
+          });
+        });
+
+        // Acc Gudang search
+        $('#accGudangSearch').on('input', function() {
+          const searchTerm = $(this).val();
+          $('.acc-gudang-item').each(function() {
+            const item = $(this);
+            const searchText = [
+              item.find('.item-id').text(),
+              item.find('.item-name').text(),
+              item.find('.item-details').text(),
+              item.find('.item-date').text()
+            ].join(' ');
+            
+            $(this).toggle(matchesKeywords(searchText, searchTerm));
+          });
+        });
+
         const sjLogRef = ref(dbLog, 'sj-log');
-        off(sjLogRef); // hindari listener ganda
+        off(sjLogRef);
 
-        onValue(sjLogRef, (snapshot) => {
-          const data = snapshot.val();
-          dataLog = data;
-          console.log(dataLog);
-          $('#modalListAccGudangBtn').removeClass('disabled');
-        }, (error) => {
-          console.error('Gagal memuat sj-log:', error);
-          $('#cartContent').html('<div class="alert alert-danger">Gagal memuat data log.</div>');
-        });
+        onValue(
+          sjLogRef,
+          (snapshot) => {
+            dataLog = snapshot.val();
+            $('#modalListAccGudangBtn').removeClass('disabled:opacity-50 disabled:cursor-not-allowed');
+          },
+          (error) => {
+            console.error('Gagal memuat sj-log:', error);
+            $('#cartContent').html(
+              '<div class="text-red-500">Gagal memuat data log.</div>'
+            );
+          }
+        );
 
-        // Trigger modal dari tombol
         $('#btnCart').on('click', () => {
-          console.log(dataLog);
           renderCart(dataLog);
+          openModal('cartModal');
         });
 
-        function toReadableDate(input) {
-          // Cek apakah input sudah dalam format "YYYY-MM-DD HH:MM:SS"
-          const isFormatted = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(input);
-          if (isFormatted) return input;
-
-          const timestamp = parseInt(input, 10);
-          if (isNaN(timestamp)) return 'Invalid input';
-
-          const dt = new Date(timestamp);
-          const pad = n => String(n).padStart(2, '0');
-
-          const YYYY = dt.getFullYear();
-          const MM = pad(dt.getMonth() + 1);
-          const DD = pad(dt.getDate());
-          const HH = pad(dt.getHours());
-          const II = pad(dt.getMinutes());
-          const SS = pad(dt.getSeconds());
-
-          return `${YYYY}-${MM}-${DD} ${HH}:${II}:${SS}`;
-        }
-
-        $('#modalListAccGudangBtn').on('click',()=>{
-          console.log("Modal List Acc");
-          const dtAccWh = _.filter(dataLog,i=>i.done === 1 && i.mkt === 'Toko');
-          const listItem = dtAccWh.map(i=>{
-            return `<div class='list-group-item border-0'>
-              <div class="card shadow shadow-sm">
-                <div class="card-body p-2">
-                  <div class='row'>
-                    <div class='col'>
-                      <span class='fw-bold'>${i.idStock}</span> | <span class='text-capitalize text-muted small'>${i.k}</span>
-                    </div>
+        $('#modalListAccGudangBtn').on('click', () => {
+          const dtAccWh = _.filter(
+            dataLog,
+            (i) => i.done === 1 && i.mkt === 'Toko'
+          );
+          
+          const listItem = dtAccWh
+            .map((i) => `
+              <div class='acc-gudang-item mb-4'>
+                <div class="bg-white rounded-lg shadow-sm border p-4">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class='font-bold item-id'>${i.idStock}</span>
+                    <span class='capitalize text-gray-500 text-sm item-name'>${i.k}</span>
                   </div>
-                  <div class="row">
-                    <div class="col-5">
-                      <div class='row mb-1'>
-                        <div class='col'>
-                          <span class="p-2 badge text-bg-primary">${i.ltrl}</span>
-                          <span class="p-2 badge text-bg-primary">${i.rkkl}</span>
-                          <span class="p-2 badge text-bg-primary">${i.q}</span>
-                        </div>
-                      </div>
-                      <div class='row'>
-                        <div class='col'>
-                          <span class="p-2 badge text-bg-primary">${toReadableDate(i.dt_m)}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-7"></div>
+                  <div class="flex flex-wrap gap-2 mb-2 item-details">
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.ltrl}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.rkkl}</span>
+                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.q}</span>
+                  </div>
+                  <div class="text-sm text-gray-500 item-date">
+                    ${toReadableDate(i.dt_m)}
                   </div>
                 </div>
               </div>
-            </div>`;
-          }).join('');
+            `)
+            .join('');
 
-          $('#listAccGudang').html(`<div class='list-group'>
-            ${listItem}
-          </div>`);
-          
-          new bootstrap.Modal(document.getElementById('modalListAccGudang')).show();
+          $('#listAccGudang').html(listItem);
+          openModal('modalListAccGudang');
         });
       });
 
-      function renderCart(data){
+      function performSearch() {
+        const keyword = $('#searchInput').val();
+        const gdMin = parseInt($('#gdMin').val(), 10);
+        const gdMax = parseInt($('#gdMax').val(), 10);
+        const tkMin = parseInt($('#tkMin').val(), 10);
+        const tkMax = parseInt($('#tkMax').val(), 10);
+
+        const rangeGd = [
+          isNaN(gdMin) ? Number.MIN_SAFE_INTEGER : gdMin,
+          isNaN(gdMax) ? Number.MAX_SAFE_INTEGER : gdMax,
+        ];
+        const rangeTk = [
+          isNaN(tkMin) ? Number.MIN_SAFE_INTEGER : tkMin,
+          isNaN(tkMax) ? Number.MAX_SAFE_INTEGER : tkMax,
+        ];
+
+        const filtered = filterDtStGr(rangeGd, rangeTk);
+        const finalResult = searchByK(keyword, filtered);
+        renderStockGroupList(finalResult);
+      }
+
+      function renderCart(data) {
         const $cartContent = $('#cartContent');
         if (!data) {
-          $cartContent.html('<div class="alert alert-warning">Tidak ada data pada sj-log.</div>');
-          cachedFiltered = [];
+          $cartContent.html(
+            '<div class="text-yellow-500">Tidak ada data pada sj-log.</div>'
+          );
           return;
         }
 
-        cachedFiltered = Object.entries(data).filter(([key, item]) =>
-          item.mkt === 'Toko' && parseInt(item.done, 10) === 0
+        const filtered = Object.entries(data).filter(
+          ([key, item]) => item.mkt === 'Toko' && parseInt(item.done, 10) === 0
         );
 
-        if (cachedFiltered.length === 0) {
-          $cartContent.html('<div class="alert alert-info">Tidak ada entri Toko dengan status done = 0.</div>');
+        if (filtered.length === 0) {
+          $cartContent.html(
+            '<div class="text-blue-500">Tidak ada entri Toko dengan status done = 0.</div>'
+          );
           return;
         }
 
-        let html = '<div class="list-group">';
-        cachedFiltered.forEach(([key, item]) => {
+        let html = '<div class="space-y-4">';
+        filtered.forEach(([key, item]) => {
           html += `
-            <div class="list-group-item">
-              <div class="row">
-                <div class="col">
-                  <h3 class="card-title mb-1">${item.idStock} | <span class="text-capitalize">${item.k}</span></h3>
-                </div>
+            <div class="cart-item bg-white rounded-lg shadow-sm border p-4">
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="text-lg font-semibold"><span class="item-id">${item.idStock}</span> | <span class="item-name capitalize ">${item.k}</span></h3>
               </div>
-              <div class="row">
-                <div class="col">
-                  <div class="mb-1 small text-muted">${item.ltrl} | ${item.rkkl} | ${item.q}</div>
-                </div>
-              </div>
-              <div class="row">
-                <div class="col">
-                  <span class="text-end text-muted small">${new Date(item.timestamp).toLocaleString()}</span>
-                </div>
-                <div class="col">
-                  <button class="py-0 fw-bold btn btn-sm btn-outline-danger btnMarkDone" data-key="${key}">
-                    Delete
-                  </button>
-                </div>
+              <div class="text-sm text-gray-500 mb-2 item-details">${item.ltrl} | ${item.rkkl} | ${item.q}</div>
+              <div class="flex justify-between items-center">
+                <span class="text-sm text-gray-500 item-timestamp">${new Date(item.timestamp).toLocaleString()}</span>
+                <button class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 btnMarkDone" data-key="${key}">
+                  Delete
+                </button>
               </div>
             </div>`;
         });
         html += '</div>';
         $cartContent.html(html);
 
-        // Re-attach handler setiap kali konten dimuat ulang
         $('.btnMarkDone').on('click', function () {
           const key = $(this).data('key');
           const itemRef = ref(dbLog, `sj-log/${key}`);
           update(itemRef, {
             done: 1,
-            dt_m: Date.now()
-          }).then(() => {
-            $(this).closest('.list-group-item').remove();
-            // $(this).closest('.col').fadeOut(() => $(this).remove());
-          }).catch(err => {
-            alert('Gagal menandai sebagai done.');
-            console.error(err);
-          });
+            dt_m: Date.now(),
+          })
+            .then(() => {
+              $(this).closest('.cart-item').fadeOut(() => $(this).remove());
+            })
+            .catch((err) => {
+              alert('Gagal menandai sebagai done.');
+              console.error(err);
+            });
         });
-
-        // $('#cartContent').html('<div class="text-muted">Memuat isi log Toko (Belum Done)...</div>');
-        new bootstrap.Modal(document.getElementById('cartModal')).show();
       }
 
       function fetchAndCacheData(path, fallbackUrl, onSuccess) {
@@ -370,23 +473,36 @@
       }
 
       function loadAllData() {
-        fetchAndCacheData('ms/data', 'https://cdn.weva.my.id/apix/data/dtStGrA', (data) => {
-          dataStockGroup = data;
-          const range = getMinMaxGdTk(data);
-          $('#gdMin').val(range.minGd);
-          $('#gdMax').val(range.maxGd);
-          $('#tkMin').val(range.minTk);
-          $('#tkMax').val(range.maxTk);
-          renderStockGroupList(data);
-        });
+        fetchAndCacheData(
+          'ms/data',
+          'https://cdn.weva.my.id/apix/data/dtStGrA',
+          (data) => {
+            dataStockGroup = data;
+            const range = getMinMaxGdTk(data);
+            $('#gdMin').val(range.minGd);
+            $('#gdMax').val(range.maxGd);
+            $('#tkMin').val(range.minTk);
+            $('#tkMax').val(range.maxTk);
+            renderStockGroupList(data);
+          }
+        );
 
-        fetchAndCacheData('ms/layer2', 'https://cdn.weva.my.id/apix/layer2A', (data) => {
-          dataLayer2 = data;
-        });
+        fetchAndCacheData(
+          'ms/layer2',
+          'https://cdn.weva.my.id/apix/layer2A',
+          (data) => {
+            dataLayer2 = data;
+          }
+        );
       }
 
       function renewAllData() {
-        if (!confirm('Download ulang data terbaru dan timpa semua data di Firebase?')) return;
+        if (
+          !confirm(
+            'Download ulang data terbaru dan timpa semua data di Firebase?'
+          )
+        )
+          return;
 
         $('#btnRenew').prop('disabled', true).text('Memperbarui...');
 
@@ -410,57 +526,61 @@
 
             Promise.all([
               remove(ref(db, 'ms/data')),
-              remove(ref(db, 'ms/layer2'))
-            ]).then(() => {
-              fbsSvcA.iDtKy('ms/data', newData, () => {
-                fbsSvcA.iDtKy('ms/layer2', newLayer, () => {
-                  loadAllData();
-                  alert('Data berhasil diperbarui dari server.');
-                  $('#btnRenew').prop('disabled', false).text('Re-New Data');
+              remove(ref(db, 'ms/layer2')),
+            ])
+              .then(() => {
+                fbsSvcA.iDtKy('ms/data', newData, () => {
+                  fbsSvcA.iDtKy('ms/layer2', newLayer, () => {
+                    loadAllData();
+                    alert('Data berhasil diperbarui dari server.');
+                    $('#btnRenew').prop('disabled', false).text('Re-New Data');
+                  });
                 });
+              })
+              .catch((err) => {
+                console.error('Gagal menghapus data lama:', err);
+                alert('Gagal menghapus data lama.');
+                $('#btnRenew').prop('disabled', false).text('Re-New Data');
               });
-            }).catch((err) => {
-              console.error('Gagal menghapus data lama:', err);
-              alert('Gagal menghapus data lama.');
-              $('#btnRenew').prop('disabled', false).text('Re-New Data');
-            });
           });
         });
       }
 
       function renderStockGroupList(data) {
         const listData = Array.isArray(data) ? data : Object.values(data);
-        const totalData = Array.isArray(dataStockGroup) ? dataStockGroup.length : Object.keys(dataStockGroup).length;
+        const totalData = Array.isArray(dataStockGroup)
+          ? dataStockGroup.length
+          : Object.keys(dataStockGroup).length;
         $('#stockSummary').text(`${listData.length} of ${totalData}`);
 
-        const sajian = listData.map((item) => {
-          const row = $(`
-            <div class="list-group-item list-group-item-action py-1" data-id_kain="${item.id_kain}">
-              <div class="row">
-                <div class="col-3"><strong>${item.id_kain}</strong></div>
-                <div class="col-7 text-capitalize">${item.k}</div>
-                <div class="col-1 text-center">${item.gd}</div>
-                <div class="col-1 text-center">${item.tk}</div>
-              </div>
+        const html = listData.map((item) => `
+          <div class="hover:bg-gray-50 cursor-pointer border-b p-3 stock-item" data-id_kain="${item.id_kain}">
+            <div class="grid grid-cols-12 gap-4">
+              <div class="col-span-3 font-medium">${item.id_kain}</div>
+              <div class="col-span-7 capitalize">${item.k}</div>
+              <div class="col-span-1 text-center">${item.gd}</div>
+              <div class="col-span-1 text-center">${item.tk}</div>
             </div>
-          `);
-          row.on('click', function () {
-            const idKain = $(this).data('id_kain');
-            const namaKain = $(this).find('.col-7').text().trim();
-            const jumlahGudang = $(this).find('.col-1:eq(0)').text().trim();
-            const jumlahToko = $(this).find('.col-1:eq(1)').text().trim();
-            showLayer2InModal(idKain, namaKain, jumlahGudang, jumlahToko);
-          });
-          return row;
-        });
+          </div>
+        `).join('');
 
-        $('#stockListContainer').html(sajian);
+        $('#stockListContainer').html(html);
+
+        $('.stock-item').on('click', function() {
+          const idKain = $(this).data('id_kain');
+          const namaKain = $(this).find('.col-span-7').text().trim();
+          const jumlahGudang = $(this).find('.col-span-1:eq(0)').text().trim();
+          const jumlahToko = $(this).find('.col-span-1:eq(1)').text().trim();
+          showLayer2InModal(idKain, namaKain, jumlahGudang, jumlahToko);
+        });
       }
 
       function filterDtStGr(rangeGd, rangeTk) {
         const [minGd, maxGd] = rangeGd;
         const [minTk, maxTk] = rangeTk;
-        const listData = Array.isArray(dataStockGroup) ? dataStockGroup : Object.values(dataStockGroup);
+        const listData = Array.isArray(dataStockGroup)
+          ? dataStockGroup
+          : Object.values(dataStockGroup);
         return listData.filter((item) => {
           const gd = parseInt(item.gd, 10);
           const tk = parseInt(item.tk, 10);
@@ -469,11 +589,11 @@
       }
 
       function searchByK(keyword, data = dataStockGroup) {
-        const tokens = keyword.toLowerCase().split(/\s+/);
+        if (!keyword) return data;
         const listData = Array.isArray(data) ? data : Object.values(data);
         return listData.filter((item) => {
-          const fieldK = (item.k || '').toLowerCase();
-          return tokens.every((token) => fieldK.includes(token));
+          const searchText = `${item.id_kain} ${item.k}`.toLowerCase();
+          return matchesKeywords(searchText, keyword);
         });
       }
 
@@ -485,86 +605,118 @@
           minGd: Math.min(...gdValues),
           maxGd: Math.max(...gdValues),
           minTk: Math.min(...tkValues),
-          maxTk: Math.max(...tkValues)
+          maxTk: Math.max(...tkValues),
         };
       }
 
       function showLayer2InModal(idKain, namaKain, jumlahGudang, jumlahToko) {
-        const targetData = Array.isArray(dataLayer2) ? dataLayer2 : Object.values(dataLayer2);
+        const targetData = Array.isArray(dataLayer2)
+          ? dataLayer2
+          : Object.values(dataLayer2);
         const filtered = targetData.filter((item) => item.id_kain === idKain);
 
-        const isGudang = (rak) => parseInt(rak, 10) >= 300 && parseInt(rak, 10) <= 318;
+        const isGudang = (rak) =>
+          parseInt(rak, 10) >= 300 && parseInt(rak, 10) <= 318;
         const gudangItems = filtered.filter((item) => isGudang(item.rak));
         const tokoItems = filtered.filter((item) => !isGudang(item.rak));
 
         const renderGroup = (title, items) => {
-          if (items.length === 0) return `<div class="fw-bold text-danger">Tidak ada data untuk ${title}.</div>`;
-          return `<h6 class="mt-3">${title}</h6><ul class="list-group">` +
-            items.map(item => `
-              <li class="list-group-item d-flex justify-content-between align-items-center cartable-item" 
-                  data-id="${item.id_stock}"
-                  data-json='${JSON.stringify(item).replace(/'/g, '&apos;')}'
-                  data-kain="${namaKain}">
-                <div class="row w-100">
-                  <div class="col">${item.id_stock}</div>
-                  <div class="col">${item.lot} # ${item.rol}</div>
-                  <div class="col">${item.rak} ${item.kol}</div>
-                  <div class="col">${item.q}</div>
+          if (items.length === 0)
+            return `<div class="font-bold text-red-500">Tidak ada data untuk ${title}.</div>`;
+          return `
+            <h6 class="font-semibold mb-3">${title}</h6>
+            <div class="space-y-2">
+              ${items.map((item) => `
+                <div class="bg-gray-50 p-3 rounded-lg cartable-item hover:bg-gray-100 cursor-pointer"
+                    data-id="${item.id_stock}"
+                    data-json='${JSON.stringify(item).replace(/'/g, '&apos;')}'
+                    data-kain="${namaKain}">
+                  <div class="grid grid-cols-4 gap-4">
+                    <div>${item.id_stock}</div>
+                    <div>${item.lot} # ${item.rol}</div>
+                    <div>${item.rak} ${item.kol}</div>
+                    <div>${item.q}</div>
+                  </div>
                 </div>
-              </li>`).join('') +
-            '</ul>';
+              `).join('')}
+            </div>`;
         };
 
-        const content = `${renderGroup('Rak Gudang', gudangItems)}${renderGroup('Rak Toko', tokoItems)}`;
-        const headerText = `[${idKain}] <span class='text-primary text-capitalize'>${namaKain}</span> [Gudang: ${jumlahGudang} — Toko: ${jumlahToko}]`;
+        const content = `
+          <div class="space-y-6">
+            ${renderGroup('Rak Gudang', gudangItems)}
+            ${renderGroup('Rak Toko', tokoItems)}
+          </div>`;
+
+        const headerText = `[${idKain}] <span class='text-blue-600 capitalize'>${namaKain}</span> [Gudang: ${jumlahGudang} — Toko: ${jumlahToko}]`;
 
         $('#layer2Modal .modal-title').html(headerText);
         $('#modalLayer2Content').html(content);
+        openModal('layer2Modal');
 
-        // Tambahkan logika cart setelah render selesai
         fbsSvcA.gDt('ms/cart', null, (existingCart) => {
-          console.log("Abc");
-          const existingIds = existingCart ? Object.values(existingCart).map(x => x.id_stock) : [];
+          const existingIds = existingCart
+            ? Object.values(existingCart).map((x) => x.id_stock)
+            : [];
 
-          $('#modalLayer2Content .cartable-item').each(function () {
+          $('.cartable-item').each(function () {
             const id = $(this).data('id');
             if (existingIds.includes(id)) {
-              $(this).addClass('bg-warning-subtle text-muted').css('pointer-events', 'none');
+              $(this)
+                .addClass('bg-yellow-100 text-gray-500')
+                .css('pointer-events', 'none');
             } else {
-              $(this).off('click').on('click', function () {
-                const item = JSON.parse($(this).attr('data-json').replace(/&apos;/g, `'`));
-                const timestamp = Date.now();
+              $(this)
+                .off('click')
+                .on('click', function () {
+                  const item = JSON.parse(
+                    $(this)
+                      .attr('data-json')
+                      .replace(/&apos;/g, `'`)
+                  );
+                  const timestamp = Date.now();
 
-                const data = {
-                  "cO": "0",
-                  "done": 0,
-                  "dt_c": stm(),
-                  "dt_m": stm(),
-                  "flow": 0,
-                  "ge": item.stts,
-                  "iMkt": "1",
-                  "idKain": item.id_kain.toString(),
-                  "idStock": item.id_stock.toString(),
-                  "k": $(this).data('kain'),
-                  "ky": 0,
-                  "ltrl": item.lot + "#" + item.rol,
-                  "mkt": "Toko",
-                  "q": item.q.toString(),
-                  "rkkl": item.rak + " " + item.kol,
-                  "timestamp": timestamp
-                };
-                const path = 'sj-log';
-                const dataRef = ref(dbLog, path);
-                const value = data;
-                (Array.isArray(value) ? value : [value]).forEach(v => set(push(dataRef), v));
-                $(this).removeClass('bg-light').addClass('bg-success text-white').css('pointer-events', 'none');
-
-              });
+                  const data = {
+                    cO: '0',
+                    done: 0,
+                    dt_c: stm(),
+                    dt_m: stm(),
+                    flow: 0,
+                    ge: item.stts,
+                    iMkt: '1',
+                    idKain: item.id_kain.toString(),
+                    idStock: item.id_stock.toString(),
+                    k: $(this).data('kain'),
+                    ky: 0,
+                    ltrl: item.lot + '#' + item.rol,
+                    mkt: 'Toko',
+                    q: item.q.toString(),
+                    rkkl: item.rak + ' ' + item.kol,
+                    timestamp: timestamp,
+                  };
+                  const path = 'sj-log';
+                  const dataRef = ref(dbLog, path);
+                  const value = data;
+                  (Array.isArray(value) ? value : [value]).forEach((v) =>
+                    set(push(dataRef), v)
+                  );
+                  $(this)
+                    .removeClass('bg-gray-50')
+                    .addClass('bg-green-100 text-green-800')
+                    .css('pointer-events', 'none');
+                });
             }
           });
         });
+      }
 
-        new bootstrap.Modal(document.getElementById('layer2Modal')).show();
+      function toReadableDate(input) {
+        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(input)) return input;
+        const timestamp = parseInt(input, 10);
+        if (isNaN(timestamp)) return 'Invalid input';
+        const dt = new Date(timestamp);
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
       }
     </script>
   </body>
