@@ -625,7 +625,7 @@
             return `<div class="font-bold text-red-500">Tidak ada data untuk ${title}.</div>`;
           return `
             <h6 class="font-semibold mb-3">${title}</h6>
-            <div class="space-y-2">
+            <div class="p-4 overflow-auto max-h-[300px]">
               ${items.map((item) => `
                 <div class="bg-gray-50 p-3 rounded-lg cartable-item hover:bg-gray-100 cursor-pointer"
                     data-id="${item.id_stock}"
@@ -643,7 +643,7 @@
         };
 
         const content = `
-          <div class="space-y-6">
+          <div class="h-full">
             ${renderGroup('Rak Gudang', gudangItems)}
             ${renderGroup('Rak Toko', tokoItems)}
           </div>`;
