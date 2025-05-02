@@ -35,6 +35,9 @@
         <div class="col-md-1">
           <div id="stockSummary" class="d-flex justify-content-center align-items-center text-muted font-monospace">0000 of 0000</div>
         </div>
+        <div class="col-auto">
+          <button id="btnAccGudang" class="btn btn-dark">Acc Gudang</button>
+        </div>
         <div class="col-md-3">
           <input id="searchInput" type="text" class="form-control" placeholder="Pencarian Nama" />
         </div>
@@ -175,6 +178,32 @@
           renderStockGroupList(finalResult);
         });
 
+
+        var dataLog = [];
+        let cachedFiltered = [];
+        const sjLogRef = ref(dbLog, 'sj-log');
+        off(sjLogRef); // hindari listener ganda
+
+        onValue(sjLogRef, (snapshot) => {
+          const data = snapshot.val();
+          dataLog = data;
+
+
+        }, (error) => {
+          console.error('Gagal memuat sj-log:', error);
+          $('#cartContent').html('<div class="alert alert-danger">Gagal memuat data log.</div>');
+        });
+
+        // Trigger modal dari tombol
+        $('#btnCart').on('click', () => {
+
+          console.log(dataLog);
+          renderCart(dataLog);
+        });
+
+
+
+/*
         $('#btnReset').on('click', () => {
           $('#searchInput').val('');
           const range = getMinMaxGdTk(dataStockGroup);
@@ -193,6 +222,8 @@
 
           onValue(sjLogRef, (snapshot) => {
             const data = snapshot.val();
+            console.log(data);
+            console.log("xxx");
             if (!data) {
               $cartContent.html('<div class="alert alert-warning">Tidak ada data pada sj-log.</div>');
               return;
@@ -258,7 +289,7 @@
 
           new bootstrap.Modal(document.getElementById('cartModal')).show();
         });
-
+*/
 
 
 
@@ -311,6 +342,76 @@
         // });
 
       });
+
+
+
+          function renderCart(data){
+            const $cartContent = $('#cartContent');
+            if (!data) {
+              $cartContent.html('<div class="alert alert-warning">Tidak ada data pada sj-log.</div>');
+              cachedFiltered = [];
+              return;
+            }
+
+            cachedFiltered = Object.entries(data).filter(([key, item]) =>
+              item.mkt === 'Toko' && parseInt(item.done, 10) === 0
+            );
+
+            if (cachedFiltered.length === 0) {
+              $cartContent.html('<div class="alert alert-info">Tidak ada entri Toko dengan status done = 0.</div>');
+              return;
+            }
+
+            let html = '<div class="list-group">';
+            cachedFiltered.forEach(([key, item]) => {
+              html += `
+                <div class="list-group-item">
+                  <div class="row">
+                    <div class="col">
+                      <h3 class="card-title mb-1">${item.idStock} | <span class="text-capitalize">${item.k}</span></h3>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <div class="mb-1 small text-muted">${item.ltrl} | ${item.rkkl} | ${item.q}</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <span class="text-end text-muted small">${new Date(item.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div class="col">
+                      <button class="py-0 fw-bold btn btn-sm btn-outline-danger btnMarkDone" data-key="${key}">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>`;
+            });
+            html += '</div>';
+            $cartContent.html(html);
+
+            // Re-attach handler setiap kali konten dimuat ulang
+            $('.btnMarkDone').on('click', function () {
+              const key = $(this).data('key');
+              const itemRef = ref(dbLog, `sj-log/${key}`);
+              update(itemRef, {
+                done: 1,
+                dt_m: Date.now()
+              }).then(() => {
+                $(this).closest('.list-group-item').remove();
+                // $(this).closest('.col').fadeOut(() => $(this).remove());
+              }).catch(err => {
+                alert('Gagal menandai sebagai done.');
+                console.error(err);
+              });
+            });
+
+            // $('#cartContent').html('<div class="text-muted">Memuat isi log Toko (Belum Done)...</div>');
+            new bootstrap.Modal(document.getElementById('cartModal')).show();
+          }
+
+
 
       function fetchAndCacheData(path, fallbackUrl, onSuccess) {
         fbsSvc.gDt(path, null, (data) => {
@@ -482,6 +583,7 @@
 
         // Tambahkan logika cart setelah render selesai
         fbsSvc.gDt('ms/cart', null, (existingCart) => {
+          console.log("Abc");
           const existingIds = existingCart ? Object.values(existingCart).map(x => x.id_stock) : [];
 
           $('#modalLayer2Content .cartable-item').each(function () {

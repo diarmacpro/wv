@@ -1,0 +1,4 @@
+done 3 == habis diganti id
+done 2 == delete dari list done
+done 1 == masuk ke list done
+done 0 == dashboard

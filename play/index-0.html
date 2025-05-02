@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Segmen Gudang & Toko</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/forms"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-gray-100 p-6 font-sans text-sm">
+
+  <!-- Search & Reload -->
+  <div class="flex items-center gap-2 mb-4">
+    <input id="searchInput" type="text" placeholder="Cari rak, kol, lot..." class="w-full max-w-xl p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white" />
+    <!-- form-input px-3 py-2 border rounded w-full max-w-sm shadow-sm focus:ring focus:ring-blue-300 -->
+    <button id="reloadBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-sm font-bold">
+      <i class="bi bi-arrow-clockwise"></i> Reload
+    </button>
+  </div>
+
+  <!-- Segmen Gudang -->
+  <div class="mb-6">
+    <h2 class="text-lg font-semibold mb-2"><i class="text-blue-500 bi bi-box-seam-fill"></i> Gudang (Rak 300–318)</h2>
+    <div id="gudangSegment" class="overflow-y-scroll overflow-x-hidden border rounded bg-white shadow-sm" style="height:300px; max-height:300px;">
+      <!-- Item akan dimasukkan lewat JS -->
+    </div>
+  </div>
+
+  <!-- Segmen Toko -->
+  <div>
+    <h2 class="text-lg font-semibold mb-2"><i class="text-blue-500 bi bi-buildings-fill"></i> Toko (Rak Lainnya)</h2>
+    <div id="tokoSegment" class="overflow-y-scroll overflow-x-hidden border rounded bg-white shadow-sm" style="height:300px; max-height:300px;">
+      <!-- Item akan dimasukkan lewat JS -->
+    </div>
+  </div>
+
+  <!-- Script Logic -->
+  <script>
+    const rawData = [
+      { "id_kain": 341, "id_rtr": "?", "id_stock": 3987, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 64, "stts": "g" },
+      { "id_kain": 341, "id_rtr": "?", "id_stock": 3988, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 63, "stts": "g" },
+      { "id_kain": 341, "id_rtr": "?", "id_stock": 3983, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 72, "stts": "g" },
+      { "id_kain": 341, "id_rtr": "?", "id_stock": 3971, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 83, "stts": "g" },
+      { "id_kain": 341, "id_rtr": "?", "id_stock": 3972, "kol": "C", "lot": "24", "q": "109.30", "rak": "041", "rol": 84, "stts": "g" },
+      { "id_kain": 341, "id_rtr": "?", "id_stock": 3978, "kol": "C", "lot": "24", "q": "109.30", "rak": "042", "rol": 87, "stts": "g" }
+    ];
+
+    function isRakGudang(rak) {
+      const rakNum = parseInt(rak, 10);
+      return rakNum >= 300 && rakNum <= 318;
+    }
+
+    function createBadge(label) {
+      return `<span class="text-[18px] inline-block bg-gray-100 text-gray-800 mr-1 mb-0 px-2 py-0 rounded-sm">${label}</span>`;
+    }
+
+    function createListItem(data) {
+      const text = `
+        ${createBadge(`${data.id_stock}`)}
+        ${createBadge(`${data.lot}#${data.rol}`)}
+        ${createBadge(`${data.rak} ${data.kol}`)}
+        ${createBadge(`${data.q}`)}
+      `;
+
+
+      return `
+        <button data-id="${data.id_stock}" class="list-item flex justify-between items-center w-full text-left p-1 border-b hover:bg-blue-50 focus:outline-none">
+          <div class="flex flex-wrap items-center gap-1">${text}</div>
+        </button>
+      `;
+    }
+
+    function renderData(data) {
+      const gudangEl = $('#gudangSegment').empty();
+      const tokoEl = $('#tokoSegment').empty();
+      const keyword = $('#searchInput').val().toLowerCase();
+
+      data.forEach(item => {
+        const allValues = `${item.id_stock} ${item.lot} ${item.rol} ${item.rak} ${item.kol} ${item.q}`.toLowerCase();
+        if (!allValues.includes(keyword)) return;
+
+        const html = createListItem(item);
+        if (isRakGudang(item.rak)) {
+          gudangEl.append(html);
+        } else {
+          tokoEl.append(html);
+        }
+      });
+
+      bindItemClick();
+    }
+
+    function bindItemClick() {
+      $('.list-item').off('click').on('click', function () {
+        $('.list-item').removeClass('bg-blue-100');
+        $(this).addClass('bg-blue-100');
+      });
+    }
+
+    $(document).ready(() => {
+      renderData(rawData);
+
+      $('#searchInput').on('input', () => renderData(rawData));
+      $('#reloadBtn').on('click', () => {
+        $('#searchInput').val('');
+        renderData(rawData);
+      });
+    });
+  </script>
+</body>
+</html>
