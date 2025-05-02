@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Input Rak</title>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script>
+    let dataRakKol = ['A 32', 'A 31', 'B 10', 'C 5', 'D 20', 'A 33', 'A 34', 'A 35', 'Z 99', 'X 1'];
+
+    $(document).ready(function () {
+      const $input = $('#rakInput');
+      const $suggestions = $('#rakSuggestions');
+
+      $input.on('input', function () {
+        const query = $(this).val().toUpperCase().trim();
+
+        $suggestions.empty();
+
+        if (!query) return;
+
+        const filtered = _.chain(dataRakKol)
+          .filter(item => _.includes(item.toUpperCase(), query))
+          .sortBy(item => {
+            const idx = item.toUpperCase().indexOf(query);
+            return idx === -1 ? 999 : idx;
+          })
+          .take(6)
+          .value();
+
+        if (filtered.length === 0) return;
+
+        filtered.forEach(item => {
+          const badge = $('<span></span>')
+            .addClass('bg-blue-100 text-blue-800 text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-200 transition')
+            .text(item)
+            .on('click', function () {
+              $input.val(item);
+              $suggestions.empty();
+            });
+
+          $suggestions.append(badge);
+        });
+      });
+
+      // Optional: sembunyikan badge saat klik di luar
+      $(document).on('click', function (e) {
+        if (!$(e.target).closest('#rakInput, #rakSuggestions').length) {
+          $suggestions.empty();
+        }
+      });
+    });
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-md mx-auto">
+    <input id="rakInput" placeholder="Mutasi Ke Rak . . . ." class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50" />
+    <div id="rakSuggestions" class="mt-2 flex flex-wrap"></div>
+  </div>
+</body>
+</html>

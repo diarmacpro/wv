@@ -151,16 +151,18 @@
     <div id="modalListAccGudang" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
       <div class="fixed inset-0 overflow-y-auto">
         <div class="flex min-h-full items-center justify-center p-4">
-          <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl">
+          <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl">
             <div class="flex justify-between items-center p-4 border-b">
-              <h5 class="text-xl font-semibold">List Acc Gudang</h5>
-              <div class="flex gap-2 items-center">
+              <div class="flex">
+                <h5 class="text-xl font-semibold me-3">List Acc Gudang</h5>
                 <input
                   id="accGudangSearch"
                   type="text"
                   class="px-3 py-1 border border-gray-300 rounded-lg"
                   placeholder="Cari acc gudang (ID, nama, lot, rak, qty)..."
                 />
+              </div>
+              <div class="flex gap-2 items-center">
                 <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('modalListAccGudang')">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -269,6 +271,50 @@
 
       function openModal(modalId) {
         document.getElementById(modalId).classList.remove('hidden');
+
+        $('.input-mutasi').on('focus',function(){
+          $('.input-mutasi').val('');
+        })
+
+        $('.input-mutasi').on('keydown', function(e) {
+          if (e.key === 'Enter') {
+            const dtKey = $(this).data('key');
+            const txVal = $(this).val();
+            const dataPick = _.filter(dataLog,i=>i.key === dtKey)[0];
+            // console.log(txVal, dtKey);
+            // console.log(dataPick);
+            const dtLoc = txVal.split(' ');
+            if(dtLoc.length == 2){
+              console.log(dtLoc);
+              const dtRak = cariRak(dtLoc[0]);
+              const dtKol = cariKol(dtLoc[1]);
+              if(dtRak && dtKol){
+                console.log("Oke");
+                $(this).val(`${dtRak.v} ${dtRak.k}`);
+                $(this).prop('disabled',true);
+                $(this).addClass('bg-gray-200 cursor-not-allowed');
+                $(this).removeClass('bg-gray-50');
+              }else{
+                alert("Lokasi Error!");
+                $(this).val('');
+              }
+            }else{
+              alert("Lokasi Error!");
+              $(this).val('');
+            }
+            // tambahkan aksi lain di sini
+          }
+        });
+
+      }
+
+      function cariKol(kol){
+        const cari = _.filter(dtRkKl.k,i=>i.v == kol);
+        return cari.length == 0 ? null : cari[0];
+      }
+      function cariRak(rak){
+        const cari = _.filter(dtRkKl.r,i=>parseInt(i.v,10) == parseInt(rak,10));
+        return cari.length == 0 ? null : cari[0];
       }
 
       function matchesKeywords(text, keywords) {
@@ -277,10 +323,17 @@
         return searchTerms.every(term => text.toLowerCase().includes(term));
       }
 
+      var dtRkKl = [];
+
       $(() => {
         fbsSvcA = new Fbs(db);
         fbsSvcB = new Fbs(dbLog);
         loadAllData();
+
+        fbsSvcB.gDt('/data','',(d)=>{
+            dtRkKl = {k:d.kol,r:d.rak};
+            console.log(dtRkKl);
+        })
 
         $('#btnRenew').on('click', renewAllData);
 
@@ -329,10 +382,17 @@
         const sjLogRef = ref(dbLog, 'sj-log');
         off(sjLogRef);
 
+
         onValue(
           sjLogRef,
           (snapshot) => {
-            dataLog = snapshot.val();
+            dataLog = [];
+            snapshot.forEach((childSnapshot) => {
+              const item = childSnapshot.val();
+              item.key = childSnapshot.key;
+              dataLog.push(item);
+            });
+            console.log(dataLog);
             $('#modalListAccGudangBtn').removeClass('disabled:opacity-50 disabled:cursor-not-allowed');
           },
           (error) => {
@@ -342,6 +402,25 @@
             );
           }
         );
+
+
+
+        /*
+        onValue(
+          sjLogRef,
+          (snapshot) => {
+            dataLog = snapshot.val();
+            console.log(dataLog);
+            $('#modalListAccGudangBtn').removeClass('disabled:opacity-50 disabled:cursor-not-allowed');
+          },
+          (error) => {
+            console.error('Gagal memuat sj-log:', error);
+            $('#cartContent').html(
+              '<div class="text-red-500">Gagal memuat data log.</div>'
+            );
+          }
+        );
+        */
 
         $('#btnCart').on('click', () => {
           renderCart(dataLog);
@@ -362,13 +441,20 @@
                     <span class='font-bold item-id'>${i.idStock}</span>
                     <span class='capitalize text-gray-500 text-sm item-name'>${i.k}</span>
                   </div>
-                  <div class="flex flex-wrap gap-2 mb-2 item-details">
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.ltrl}</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.rkkl}</span>
-                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.q}</span>
-                  </div>
-                  <div class="text-sm text-gray-500 item-date">
-                    ${toReadableDate(i.dt_m)}
+                  <div class="grid grid-cols-3 gap-4">
+                    <div>
+                      <div class="grid grid-cols-3 gap-1 item-details">
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.ltrl}</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.rkkl}</span>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.q}</span>
+                      </div>
+                      <div class="text-sm text-gray-500 item-date">
+                        ${toReadableDate(i.dt_m)}
+                      </div>
+                    </div>
+                    <div class="col-span-2">
+                      <input data-key="${i.key}" placeholder="Mutasi Ke Rak . . . ." class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 input-mutasi">
+                    </div>
                   </div>
                 </div>
               </div>
@@ -718,6 +804,9 @@
         const pad = (n) => String(n).padStart(2, '0');
         return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
       }
+
+      $(()=>{
+      })
     </script>
   </body>
 </html>

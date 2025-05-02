@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Input Rak</title>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .is-invalid {
+      border-color: #dc2626 !important;
+      box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.25);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-md mx-auto">
+    <input id="rakInput" placeholder="Mutasi Ke Rak . . . ." class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none bg-gray-50" />
+    <div id="rakSuggestions" class="mt-2 flex flex-wrap"></div>
+  </div>
+
+  <script>
+    let kol = [];
+    let rak = [];
+
+    // Load JSON
+    $.getJSON('a.json', function(json) {
+      kol = json.kol.map(item => item.v.toUpperCase());
+      rak = json.rak.map(item => item.v.toUpperCase());
+    });
+
+    $(document).ready(function () {
+      const $input = $('#rakInput');
+      const $suggestions = $('#rakSuggestions');
+
+      $input.on('input', function () {
+        const raw = $(this).val().toUpperCase().trim();
+        const [part1, part2] = raw.split(" ");
+
+        $suggestions.empty();
+
+        if (!part1) {
+          $input.removeClass('is-invalid');
+          return;
+        }
+
+        const matchedKol = kol.filter(k => k.startsWith(part1)).slice(0, 5);
+        const matchedRak = part2 ? rak.filter(r => r.startsWith(part2)).slice(0, 5) : [];
+
+        const showBadges = [...matchedKol.map(k => `${k} ...`), ...matchedRak.map(r => `... ${r}`)];
+
+        if (showBadges.length === 0) {
+          $input.addClass('is-invalid');
+        } else {
+          $input.removeClass('is-invalid');
+        }
+
+        showBadges.forEach(item => {
+          const badge = $('<span></span>')
+            .addClass('bg-blue-100 text-blue-800 text-sm font-medium mr-2 mb-2 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-200 transition')
+            .text(item)
+            .on('click', function () {
+              $input.val(item.replace('...', '').trim());
+              $suggestions.empty();
+            });
+
+          $suggestions.append(badge);
+        });
+      });
+
+      // Sembunyikan badge saat klik di luar
+      $(document).on('click', function (e) {
+        if (!$(e.target).closest('#rakInput, #rakSuggestions').length) {
+          $suggestions.empty();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
