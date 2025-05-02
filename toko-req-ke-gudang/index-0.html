@@ -22,9 +22,9 @@
         -webkit-appearance: none;
         margin: 0;
       }
-      input[type=number] {
+      /* input[type=number] {
         -moz-appearance: textfield;
-      }
+      } */
     </style>
   </head>
   <body>
@@ -219,6 +219,147 @@
           console.log("Modal List Acc");
           new bootstrap.Modal(document.getElementById('modalListAccGudang')).show();
         })
+
+
+
+/*
+        $('#btnReset').on('click', () => {
+          $('#searchInput').val('');
+          const range = getMinMaxGdTk(dataStockGroup);
+          $('#gdMin').val(range.minGd);
+          $('#gdMax').val(range.maxGd);
+          $('#tkMin').val(range.minTk);
+          $('#tkMax').val(range.maxTk);
+          renderStockGroupList(dataStockGroup);
+        });
+
+        $('#btnCart').on('click', () => {
+          const $cartContent = $('#cartContent').html('<div class="text-muted">Memuat isi log Toko (Belum Done)...</div>');
+
+          const sjLogRef = ref(dbLog, 'sj-log');
+          off(sjLogRef); // pastikan tidak ada listener ganda
+
+          onValue(sjLogRef, (snapshot) => {
+            const data = snapshot.val();
+            console.log(data);
+            console.log("xxx");
+            if (!data) {
+              $cartContent.html('<div class="alert alert-warning">Tidak ada data pada sj-log.</div>');
+              return;
+            }
+
+            const filtered = Object.entries(data).filter(([key, item]) =>
+              item.mkt === 'Toko' && parseInt(item.done, 10) === 0
+            );
+
+            if (filtered.length === 0) {
+              $cartContent.html('<div class="alert alert-info">Tidak ada entri Toko dengan status done = 0.</div>');
+              return;
+            }
+
+            let html = '<div class="list-group">';
+            filtered.forEach(([key, item]) => {
+              html += `
+                <div class="list-group-item">
+                  <div class="row">
+                    <div class="col">
+                      <h3 class="card-title mb-1">${item.idStock} | <span class="text-capitalize">${item.k}</span></h3>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <div class="mb-1 small text-muted">${item.ltrl} | ${item.rkkl} | ${item.q}</div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      <span class="text-end text-muted small">${new Date(item.timestamp).toLocaleString()}</span>
+                    </div>
+                    <div class="col">
+                      <button class="py-0 fw-bold btn btn-sm btn-outline-danger btnMarkDone" data-key="${key}">
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>`;
+            });
+            html += '</div>';
+            $cartContent.html(html);
+
+            // Handler tombol delete (ubah done = 1)
+            $('.btnMarkDone').on('click', function () {
+              const key = $(this).data('key');
+              const itemRef = ref(dbLog, `sj-log/${key}`);
+              update(itemRef, {
+                done: 1,
+                dt_m: Date.now()
+              }).then(() => {
+                $(this).closest('.col').fadeOut(() => $(this).remove());
+              }).catch(err => {
+                alert('Gagal menandai sebagai done.');
+                console.error(err);
+              });
+            });
+
+          }, (error) => {
+            console.error('Gagal memuat sj-log:', error);
+            $cartContent.html('<div class="alert alert-danger">Gagal memuat data log.</div>');
+          });
+
+          new bootstrap.Modal(document.getElementById('cartModal')).show();
+        });
+*/
+
+
+
+
+        // $('#btnCart').on('click', () => {
+        //   const $cartContent = $('#cartContent').html('<div class="text-muted">Memuat isi cart...</div>');
+
+        //   // fbsSvc.gDt('ms/cart', null, (cart) => {
+        //   //   if (!cart || Object.keys(cart).length === 0) {
+        //   //     $cartContent.html('<div class="alert alert-warning">Cart kosong.</div>');
+        //   //     return;
+        //   //   }
+
+        //   //   const items = Object.values(cart);
+        //   //   let html = '<ul class="list-group">';
+        //   //   items.forEach(item => {
+        //   //     html += `
+        //   //       <li class="list-group-item d-flex justify-content-between align-items-center">
+        //   //         <div class="flex-grow-1">
+        //   //           <div><strong>${item.id_stock}</strong></div>
+        //   //           <div>${item.lot} # ${item.rol}</div>
+        //   //           <div>${item.rak} ${item.kol}</div>
+        //   //           <div>Qty: ${item.q}</div>
+        //   //         </div>
+        //   //         <button class="btn btn-sm btn-outline-danger btnRemoveFromCart" data-id="${item.id_stock}">Hapus</button>
+        //   //       </li>
+        //   //     `;
+        //   //   });
+        //   //   html += '</ul>';
+        //   //   $cartContent.html(html);
+
+        //   //   // Event Hapus
+        //   //   $('.btnRemoveFromCart').on('click', function () {
+        //   //     const idToRemove = $(this).data('id');
+
+        //   //     fbsSvc.gDt('ms/cart', null, (cartData) => {
+        //   //       const keyToDelete = Object.keys(cartData || {}).find(k => cartData[k].id_stock === idToRemove);
+        //   //       if (keyToDelete) {
+        //   //         remove(ref(db, `ms/cart/${keyToDelete}`), () => {
+        //   //           $(this).closest('li').fadeOut(() => $(this).remove());
+        //   //         });
+        //   //       }
+        //   //     });
+        //   //   });
+        //   // });
+
+
+          
+        //   new bootstrap.Modal(document.getElementById('cartModal')).show();
+        // });
+
       });
 
 
@@ -425,6 +566,7 @@
           maxTk: Math.max(...tkValues)
         };
       }
+
 
       function showLayer2InModal(idKain, namaKain, jumlahGudang, jumlahToko) {
         const targetData = Array.isArray(dataLayer2) ? dataLayer2 : Object.values(dataLayer2);
