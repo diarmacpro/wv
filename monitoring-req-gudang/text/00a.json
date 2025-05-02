@@ -1,0 +1,52 @@
+{
+    "cO": "0",
+    "done": 0,
+    "dt_c": "2025-04-28 10:32:34",
+    "dt_m": "2025-04-28 10:32:34",
+    "flow": 0,
+    "ge": "g",
+    "iMkt": "6",
+    "idKain": "970",
+    "idStock": "45346",
+    "k": "Prisma Diamond Putih, K.11",
+    "ky": 88081,
+    "ltrl": "49#6",
+    "mkt": "Donny",
+    "q": "97.00",
+    "rkkl": "307 A",
+    "timestamp": 1745811153960
+}
+
+
+menjadi seperti ini
+{
+    "cO": "0",
+    "done": 0,
+    "dt_c": "2025-04-28 10:32:34",
+        "dt_m": "2025-04-29 11:51:22",
+    "flow": 0,
+    "ge": "g",
+    "iMkt": "6",
+    "idKain": "970",
+        "idStock": "45347",
+    "k": "Prisma Diamond Putih, K.11",
+        "ky": 0,
+        "ltrl": "49#7",
+    "mkt": "Donny",
+        "q": "94.00",
+        "rkkl": "307 B",
+        "timestamp": datDate.now(),
+        "change_pic":"WH Pic"
+}
+
+merubah value dari properti ini
+"dt_m": "2025-04-29 11:51:22",
+"idStock": "45347",
+"ky": 0,
+"ltrl": "49#7",
+"q": "94.00",
+"rkkl": "307 B",
+"timestamp": datDate.now(),
+
+menambah properti ini
+"change_pic":"WH Pic"
