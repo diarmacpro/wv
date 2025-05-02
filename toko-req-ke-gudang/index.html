@@ -3,7 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Stock Viewer</title>
+    <title>DATA — Grosir</title>
+    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/628/628300.png">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous" />
     <style>
       ::-webkit-scrollbar {
@@ -36,7 +37,7 @@
           <div id="stockSummary" class="d-flex justify-content-center align-items-center text-muted font-monospace">0000 of 0000</div>
         </div>
         <div class="col-auto">
-          <button id="modalListAccGudangBtn" class="btn btn-dark">Acc Gudang</button>
+          <button id="modalListAccGudangBtn" class="btn btn-dark disabled">Acc Gudang</button>
         </div>
         <div class="col-md-3">
           <input id="searchInput" type="text" class="form-control" placeholder="Pencarian Nama" />
@@ -110,13 +111,17 @@
 
     <!-- Modal Cart -->
     <div class="modal fade" id="modalListAccGudang" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">List Acc Gudang</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
           </div>
-          <div class="modal-body" id="listAccGudang">
+          <div class="modal-body p-0">
+            <div class="overflow-scroll overflow-x-hidden px-3 py-2 border" style="max-height:100px">
+              <input class="form-control form-control-lg rounded-0 shadow-none">
+            </div>            
+            <div id="listAccGudang" class="overflow-scroll overflow-x-hidden" style="max-height:500px"></div>
             <!-- <div class="text-muted">Memuat isi cart...</div> -->
           </div>
         </div>
@@ -127,8 +132,12 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.5/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.8.4/dist/axios.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@ed7e89566bc79c8846bcba6d8155536f98bab1e6/base62_0.0.0.1.js"></script>
-    <script src="./script.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@ed7e89566bc79c8846bcba6d8155536f98bab1e6/base62_0.0.0.1.js"></script> -->
+    <!-- <script src="./script.js"></script> -->
+
+    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@4849b7e3a19e88b14d27454f60d16c062e16648d/core.js" integrity="sha256-xxU8WD/MI8uoZ1geRPVqbSvo6MuHLOUHfu/0Vg8Bewg=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@f52d4e44b5e1b0405705bf4555d9fc6a3558ae61/firebase-olah-data/f.o.d_v.0.1.js" integrity="sha256-zWulae3cn5J3A+XOHBtvtBUR7ZWYCl49OslL4exrlyQ=" crossorigin="anonymous"></script>
+
     <script type="module">
       import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
       import {
@@ -157,7 +166,7 @@
         messagingSenderId: "463129964774",
         appId: "1:463129964774:web:351332e003a5a88c434b27",
         measurementId: "G-L8KRSPHTNN"
-      });
+      }, 'appLog');
 
       const db = getDatabase(app);
       const dbLog = getDatabase(appLog);
@@ -170,10 +179,13 @@
     </script>
 
     <script>
-      let fbsSvc, dataStockGroup = [], dataLayer2 = [];
+      let fbsSvc, fbsSvcA, fbsSvcB, dataStockGroup = [], dataLayer2 = [];
+      var dataLog = [];
 
       $(() => {
-        fbsSvc = new Fbs();
+        // fbsSvc = new Fbs(app);
+        fbsSvcA = new Fbs(db);
+        fbsSvcB = new Fbs(dbLog);
         loadAllData();
 
         $('#btnRenew').on('click', renewAllData);
@@ -193,8 +205,6 @@
           renderStockGroupList(finalResult);
         });
 
-
-        var dataLog = [];
         let cachedFiltered = [];
         const sjLogRef = ref(dbLog, 'sj-log');
         off(sjLogRef); // hindari listener ganda
@@ -202,8 +212,8 @@
         onValue(sjLogRef, (snapshot) => {
           const data = snapshot.val();
           dataLog = data;
-
-
+          console.log(dataLog);
+          $('#modalListAccGudangBtn').removeClass('disabled');
         }, (error) => {
           console.error('Gagal memuat sj-log:', error);
           $('#cartContent').html('<div class="alert alert-danger">Gagal memuat data log.</div>');
@@ -215,13 +225,68 @@
           renderCart(dataLog);
         });
 
+        function toReadableDate(input) {
+          // Cek apakah input sudah dalam format "YYYY-MM-DD HH:MM:SS"
+          const isFormatted = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(input);
+          if (isFormatted) return input;
+
+          const timestamp = parseInt(input, 10);
+          if (isNaN(timestamp)) return 'Invalid input';
+
+          const dt = new Date(timestamp);
+          const pad = n => String(n).padStart(2, '0');
+
+          const YYYY = dt.getFullYear();
+          const MM = pad(dt.getMonth() + 1);
+          const DD = pad(dt.getDate());
+          const HH = pad(dt.getHours());
+          const II = pad(dt.getMinutes());
+          const SS = pad(dt.getSeconds());
+
+          return `${YYYY}-${MM}-${DD} ${HH}:${II}:${SS}`;
+        }
+
         $('#modalListAccGudangBtn').on('click',()=>{
           console.log("Modal List Acc");
+          const dtAccWh = _.filter(dataLog,i=>i.done === 1 && i.mkt === 'Toko');
+          const listItem = dtAccWh.map(i=>{
+            return `<div class='list-group-item border-0'>
+              <div class="card shadow shadow-sm">
+                <div class="card-body p-2">
+                  <div class='row'>
+                    <div class='col'>
+                      <span class='fw-bold'>${i.idStock}</span> | <span class='text-capitalize text-muted small'>${i.k}</span>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-5">
+                      <div class='row mb-1'>
+                        <div class='col'>
+                          <span class="p-2 badge text-bg-primary">${i.ltrl}</span>
+                          <span class="p-2 badge text-bg-primary">${i.rkkl}</span>
+                          <span class="p-2 badge text-bg-primary">${i.q}</span>
+                        </div>
+                      </div>
+                      <div class='row'>
+                        <div class='col'>
+                          <span class="p-2 badge text-bg-primary">${toReadableDate(i.dt_m)}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-7"></div>
+                  </div>
+                </div>
+              </div>
+            </div>`;
+          }).join('');
+
+          $('#listAccGudang').html(`<div class='list-group'>
+            ${listItem}
+          </div>`);
+          
           new bootstrap.Modal(document.getElementById('modalListAccGudang')).show();
-        })
+        });
       });
-
-
 
       function renderCart(data){
         const $cartContent = $('#cartContent');
@@ -289,17 +354,15 @@
         new bootstrap.Modal(document.getElementById('cartModal')).show();
       }
 
-
-
       function fetchAndCacheData(path, fallbackUrl, onSuccess) {
-        fbsSvc.gDt(path, null, (data) => {
+        fbsSvcA.gDt(path, null, (data) => {
           if (data) {
             onSuccess(data);
           } else {
             pR(fallbackUrl, {}, (err, res) => {
               if (!err && res?.data) {
                 const result = res.data;
-                fbsSvc.iDtKy(path, result, () => onSuccess(result));
+                fbsSvcA.iDtKy(path, result, () => onSuccess(result));
               }
             });
           }
@@ -349,8 +412,8 @@
               remove(ref(db, 'ms/data')),
               remove(ref(db, 'ms/layer2'))
             ]).then(() => {
-              fbsSvc.iDtKy('ms/data', newData, () => {
-                fbsSvc.iDtKy('ms/layer2', newLayer, () => {
+              fbsSvcA.iDtKy('ms/data', newData, () => {
+                fbsSvcA.iDtKy('ms/layer2', newLayer, () => {
                   loadAllData();
                   alert('Data berhasil diperbarui dari server.');
                   $('#btnRenew').prop('disabled', false).text('Re-New Data');
@@ -459,7 +522,7 @@
         $('#modalLayer2Content').html(content);
 
         // Tambahkan logika cart setelah render selesai
-        fbsSvc.gDt('ms/cart', null, (existingCart) => {
+        fbsSvcA.gDt('ms/cart', null, (existingCart) => {
           console.log("Abc");
           const existingIds = existingCart ? Object.values(existingCart).map(x => x.id_stock) : [];
 
