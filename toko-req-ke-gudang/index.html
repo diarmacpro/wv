@@ -4,23 +4,23 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>DATA — Grosir</title>
-    <link
-      rel="icon"
-      href="https://cdn-icons-png.freepik.com/512/628/628300.png"
-    />
+    <link rel="icon" href="https://cdn-icons-png.freepik.com/512/628/628300.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       ::-webkit-scrollbar {
         width: 3px;
         height: 3px;
       }
+
       ::-webkit-scrollbar-track {
         background: #ddd;
       }
+
       ::-webkit-scrollbar-thumb {
         background: #888;
         border-radius: 10px;
       }
+
       input::-webkit-outer-spin-button,
       input::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -33,57 +33,21 @@
       <h1 class="text-3xl font-bold mb-6 text-gray-800">Stock Grosir</h1>
       <div class="flex flex-wrap gap-3 items-center mb-6">
         <div class="w-32">
-          <div id="stockSummary" class="text-sm text-gray-500 font-mono text-center">
-            0000 of 0000
-          </div>
+          <div id="stockSummary" class="text-sm text-gray-500 font-mono text-center"> 0000 of 0000 </div>
         </div>
-        <button id="modalListAccGudangBtn" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed">
-          Acc Gudang
-        </button>
-        <input
-          id="searchInput"
-          type="text"
-          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="Pencarian ID/Nama (contoh: 24s com ken ku)"
-        />
-        <input
-          id="gdMin"
-          type="number"
-          class="w-24 px-4 py-2 border border-gray-300 rounded-lg"
-          placeholder="Gd Min"
-        />
-        <input
-          id="gdMax"
-          type="number"
-          class="w-24 px-4 py-2 border border-gray-300 rounded-lg"
-          placeholder="Gd Max"
-        />
-        <input
-          id="tkMin"
-          type="number"
-          class="w-24 px-4 py-2 border border-gray-300 rounded-lg"
-          placeholder="Tk Min"
-        />
-        <input
-          id="tkMax"
-          type="number"
-          class="w-24 px-4 py-2 border border-gray-300 rounded-lg"
-          placeholder="Tk Max"
-        />
+        <button id="modalListAccGudangBtn" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"> Acc Gudang </button>
+        <input id="searchInput" type="text" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Pencarian ID/Nama (contoh: 24s com ken ku)" />
+        <input id="gdMin" type="number" class="w-24 px-4 py-2 border border-gray-300 rounded-lg" placeholder="Gd Min" />
+        <input id="gdMax" type="number" class="w-24 px-4 py-2 border border-gray-300 rounded-lg" placeholder="Gd Max" />
+        <input id="tkMin" type="number" class="w-24 px-4 py-2 border border-gray-300 rounded-lg" placeholder="Tk Min" />
+        <input id="tkMax" type="number" class="w-24 px-4 py-2 border border-gray-300 rounded-lg" placeholder="Tk Max" />
         <!-- <button id="btnSearch" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
           Cari
         </button> -->
-        <button id="btnReset" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">
-          Reset
-        </button>
-        <button id="btnCart" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
-          Cart
-        </button>
-        <button id="btnRenew" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-          Re-New Data
-        </button>
+        <button id="btnReset" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600"> Reset </button>
+        <button id="btnCart" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"> Cart </button>
+        <button id="btnRenew" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"> Re-New Data </button>
       </div>
-      
       <div class="bg-white rounded-lg shadow">
         <div class="bg-gray-800 text-white p-3 rounded-t-lg">
           <div class="grid grid-cols-12 gap-4">
@@ -96,7 +60,6 @@
         <div id="stockListContainer" class="overflow-auto max-h-[500px]"></div>
       </div>
     </div>
-
     <!-- Modal Layer 2 -->
     <div id="layer2Modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
       <div class="fixed inset-0 overflow-y-auto">
@@ -117,7 +80,6 @@
         </div>
       </div>
     </div>
-
     <!-- Modal Cart -->
     <div id="cartModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
       <div class="fixed inset-0 overflow-y-auto">
@@ -126,12 +88,7 @@
             <div class="flex justify-between items-center p-4 border-b">
               <h5 class="text-xl font-semibold">Cart</h5>
               <div class="flex gap-2 items-center">
-                <input
-                  id="cartSearch"
-                  type="text"
-                  class="px-3 py-1 border border-gray-300 rounded-lg"
-                  placeholder="Cari di cart (ID, nama, lot, rak, qty)..."
-                />
+                <input id="cartSearch" type="text" class="px-3 py-1 border border-gray-300 rounded-lg" placeholder="Cari di cart (ID, nama, lot, rak, qty)..." />
                 <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('cartModal')">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -146,7 +103,6 @@
         </div>
       </div>
     </div>
-
     <!-- Modal List Acc Gudang -->
     <div id="modalListAccGudang" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
       <div class="fixed inset-0 overflow-y-auto">
@@ -155,12 +111,7 @@
             <div class="flex justify-between items-center p-4 border-b">
               <div class="flex">
                 <h5 class="text-xl font-semibold me-3">List Acc Gudang</h5>
-                <input
-                  id="accGudangSearch"
-                  type="text"
-                  class="px-3 py-1 border border-gray-300 rounded-lg"
-                  placeholder="Cari acc gudang (ID, nama, lot, rak, qty)..."
-                />
+                <input id="accGudangSearch" type="text" class="px-3 py-1 border border-gray-300 rounded-lg" placeholder="Cari acc gudang (ID, nama, lot, rak, qty)..." />
               </div>
               <div class="flex gap-2 items-center">
                 <button class="text-gray-500 hover:text-gray-700" onclick="closeModal('modalListAccGudang')">
@@ -175,23 +126,25 @@
         </div>
       </div>
     </div>
-
+    <!-- Modal List Acc Gudang -->
+    <div id="confrimMutasi" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+      <div class="fixed inset-0 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+          <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl">
+            <h1>Abc</h1>
+          </div>
+        </div>
+      </div>
+    </div>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.8.4/dist/axios.min.js"></script>
-    <script
-      src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@4849b7e3a19e88b14d27454f60d16c062e16648d/core.js"
-      integrity="sha256-xxU8WD/MI8uoZ1geRPVqbSvo6MuHLOUHfu/0Vg8Bewg="
-      crossorigin="anonymous"
-    ></script>
-    <script
-      src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@f52d4e44b5e1b0405705bf4555d9fc6a3558ae61/firebase-olah-data/f.o.d_v.0.1.js"
-      integrity="sha256-zWulae3cn5J3A+XOHBtvtBUR7ZWYCl49OslL4exrlyQ="
-      crossorigin="anonymous"
-    ></script>
-
+    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@4849b7e3a19e88b14d27454f60d16c062e16648d/core.js" integrity="sha256-xxU8WD/MI8uoZ1geRPVqbSvo6MuHLOUHfu/0Vg8Bewg=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/diarmacpro/cdnku@f52d4e44b5e1b0405705bf4555d9fc6a3558ae61/firebase-olah-data/f.o.d_v.0.1.js" integrity="sha256-zWulae3cn5J3A+XOHBtvtBUR7ZWYCl49OslL4exrlyQ=" crossorigin="anonymous"></script>
     <script type="module">
-      import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
+      import {
+        initializeApp
+      } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js';
       import {
         getDatabase,
         ref,
@@ -206,40 +159,28 @@
         onValue,
         off,
       } from 'https://www.gstatic.com/firebasejs/11.6.0/firebase-database.js';
-
-      const app = initializeApp(
-        {
-          apiKey: 'AIzaSyA6bsGsF_0zbb24zR3SPnoSxtv1uM-8_iA',
-          authDomain: 'main-stock-wv.firebaseapp.com',
-          databaseURL:
-            'https://main-stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app',
-          projectId: 'main-stock-wv',
-          storageBucket: 'main-stock-wv.appspot.com',
-          messagingSenderId: '78765716904',
-          appId: '1:78765716904:web:fb0033e181ee6dc1ef599d',
-          measurementId: 'G-CWXCZV2LCF',
-        },
-        'logApp'
-      );
-
-      const appLog = initializeApp(
-        {
-          apiKey: 'AIzaSyDrDGh1YVtBBIdgNTMS9p_PY24uelBZx-w',
-          authDomain: 'stock-wv.firebaseapp.com',
-          databaseURL:
-            'https://stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app',
-          projectId: 'stock-wv',
-          storageBucket: 'stock-wv.firebasestorage.app',
-          messagingSenderId: '463129964774',
-          appId: '1:463129964774:web:351332e003a5a88c434b27',
-          measurementId: 'G-L8KRSPHTNN',
-        },
-        'appLog'
-      );
-
+      const app = initializeApp({
+        apiKey: 'AIzaSyA6bsGsF_0zbb24zR3SPnoSxtv1uM-8_iA',
+        authDomain: 'main-stock-wv.firebaseapp.com',
+        databaseURL: 'https://main-stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app',
+        projectId: 'main-stock-wv',
+        storageBucket: 'main-stock-wv.appspot.com',
+        messagingSenderId: '78765716904',
+        appId: '1:78765716904:web:fb0033e181ee6dc1ef599d',
+        measurementId: 'G-CWXCZV2LCF',
+      }, 'logApp');
+      const appLog = initializeApp({
+        apiKey: 'AIzaSyDrDGh1YVtBBIdgNTMS9p_PY24uelBZx-w',
+        authDomain: 'stock-wv.firebaseapp.com',
+        databaseURL: 'https://stock-wv-default-rtdb.asia-southeast1.firebasedatabase.app',
+        projectId: 'stock-wv',
+        storageBucket: 'stock-wv.firebasestorage.app',
+        messagingSenderId: '463129964774',
+        appId: '1:463129964774:web:351332e003a5a88c434b27',
+        measurementId: 'G-L8KRSPHTNN',
+      }, 'appLog');
       const db = getDatabase(app);
       const dbLog = getDatabase(appLog);
-
       Object.assign(window, {
         db,
         dbLog,
@@ -256,7 +197,6 @@
         off,
       });
     </script>
-
     <script>
       let fbsSvc,
         fbsSvcA,
@@ -265,55 +205,88 @@
         dataLayer2 = [];
       var dataLog = [];
 
-      function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
+      function openModal(modalId, callback = null) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.remove('hidden');
+          if (typeof callback === 'function') {
+            callback();
+          }
+        }
       }
 
-      function openModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
+      function closeModal(modalId, callback = null) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.add('hidden');
+          if (typeof callback === 'function') {
+            callback();
+          }
+        }
+      }
 
-        $('.input-mutasi').on('focus',function(){
-          $('.input-mutasi').val('');
-        })
-
-        $('.input-mutasi').on('keydown', function(e) {
-          if (e.key === 'Enter') {
-            const dtKey = $(this).data('key');
-            const txVal = $(this).val();
-            const dataPick = _.filter(dataLog,i=>i.key === dtKey)[0];
-            // console.log(txVal, dtKey);
-            // console.log(dataPick);
-            const dtLoc = txVal.split(' ');
-            if(dtLoc.length == 2){
-              console.log(dtLoc);
-              const dtRak = cariRak(dtLoc[0]);
-              const dtKol = cariKol(dtLoc[1]);
-              if(dtRak && dtKol){
-                console.log("Oke");
-                $(this).val(`${dtRak.v} ${dtRak.k}`);
-                $(this).prop('disabled',true);
-                $(this).addClass('bg-gray-200 cursor-not-allowed');
-                $(this).removeClass('bg-gray-50');
-              }else{
+      function openModalListAccGudang(modalId) {
+        openModal(modalId, () => {
+          /**
+           * Pengaturan Listener Untuk Validasi Lokasi
+           * **/
+          $('.input-mutasi').on('focus', function() {
+            $('.input-mutasi:not([disabled])').val('');
+          });
+          $('.input-mutasi').on('keydown', function(e) {
+            if (e.key === 'Enter') {
+              const dtKey = $(this).data('key');
+              const txVal = $(this).val();
+              // const dataPick = _.filter(dataLog, i => i.key === dtKey)[0];
+              // console.log(txVal, dtKey);
+              // console.log(dataPick);
+              const dtLoc = txVal.split(' ');
+              if (dtLoc.length == 2) {
+                // console.log(dtLoc);
+                const dtRak = cariRak(dtLoc[0]);
+                const dtKol = cariKol(dtLoc[1]);
+                // console.log([dtRak,dtKol]);
+                if (dtRak && dtKol) {
+                  // console.log([dtRak,dtKol]);
+                  $(this).val(`${dtRak.v} ${dtKol.v}`);
+                  $(this).prop('disabled', true);
+                  $(this).addClass('bg-gray-200 cursor-not-allowed');
+                  $(this).removeClass('bg-gray-50');
+                  $(this).siblings('button').addClass('hover:text-blue-300');
+                  $(this).siblings('button').removeClass('cursor-not-allowed');
+                  $(this).siblings('button').prop('disabled', false);
+                  $(this).siblings('button').removeClass('text-red-100');
+                  $(this).siblings('button').addClass('text-blue-500');
+                  // $(this).blur();
+                } else {
+                  alert("Lokasi Error!");
+                  $(this).val('');
+                }
+              } else {
                 alert("Lokasi Error!");
                 $(this).val('');
               }
-            }else{
-              alert("Lokasi Error!");
-              $(this).val('');
+              4
+              // tambahkan aksi lain di sini
             }
-            // tambahkan aksi lain di sini
-          }
+          });
+          $('.save-location').on('click', function(){
+            const valDt = $(this).siblings('input').data('key');
+            // console.log(valDt);
+            const dataPick = _.filter(dataLog, i => i.key === valDt);
+            const dataVal = dataPick.length == 0 ? null : dataPick[0];
+            console.log(dataVal);
+          })
         });
-
       }
 
-      function cariKol(kol){
-        const cari = _.filter(dtRkKl.k,i=>i.v == kol);
+      function cariKol(kol) {
+        const cari = _.filter(dtRkKl.k, i => i.v.toLowerCase() == kol.toLowerCase());
         return cari.length == 0 ? null : cari[0];
       }
-      function cariRak(rak){
-        const cari = _.filter(dtRkKl.r,i=>parseInt(i.v,10) == parseInt(rak,10));
+
+      function cariRak(rak) {
+        const cari = _.filter(dtRkKl.r, i => parseInt(i.v, 10) == parseInt(rak, 10));
         return cari.length == 0 ? null : cari[0];
       }
 
@@ -322,21 +295,19 @@
         const searchTerms = keywords.toLowerCase().split(/\s+/);
         return searchTerms.every(term => text.toLowerCase().includes(term));
       }
-
       var dtRkKl = [];
-
       $(() => {
         fbsSvcA = new Fbs(db);
         fbsSvcB = new Fbs(dbLog);
         loadAllData();
-
-        fbsSvcB.gDt('/data','',(d)=>{
-            dtRkKl = {k:d.kol,r:d.rak};
-            console.log(dtRkKl);
+        fbsSvcB.gDt('/data', '', (d) => {
+          dtRkKl = {
+            k: d.kol,
+            r: d.rak
+          };
+          console.log(dtRkKl);
         })
-
         $('#btnRenew').on('click', renewAllData);
-
         // Enhanced search functionality
         $('#searchInput').on('input', performSearch);
         $('#gdMin, #gdMax, #tkMin, #tkMax').on('input', performSearch);
@@ -346,7 +317,6 @@
           loadAllData();
           // renderStockGroupList(dataStockGroup);
         });
-
         // Cart search
         $('#cartSearch').on('input', function() {
           const searchTerm = $(this).val();
@@ -358,11 +328,9 @@
               item.find('.item-details').text(),
               item.find('.item-timestamp').text()
             ].join(' ');
-            
             $(this).toggle(matchesKeywords(searchText, searchTerm));
           });
         });
-
         // Acc Gudang search
         $('#accGudangSearch').on('input', function() {
           const searchTerm = $(this).val();
@@ -374,17 +342,12 @@
               item.find('.item-details').text(),
               item.find('.item-date').text()
             ].join(' ');
-            
             $(this).toggle(matchesKeywords(searchText, searchTerm));
           });
         });
-
         const sjLogRef = ref(dbLog, 'sj-log');
         off(sjLogRef);
-
-
-        onValue(
-          sjLogRef,
+        onValue(sjLogRef,
           (snapshot) => {
             dataLog = [];
             snapshot.forEach((childSnapshot) => {
@@ -397,14 +360,8 @@
           },
           (error) => {
             console.error('Gagal memuat sj-log:', error);
-            $('#cartContent').html(
-              '<div class="text-red-500">Gagal memuat data log.</div>'
-            );
-          }
-        );
-
-
-
+            $('#cartContent').html(' < div class = "text-red-500" > Gagal memuat data log. < /div>');
+          });
         /*
         onValue(
           sjLogRef,
@@ -416,53 +373,61 @@
           (error) => {
             console.error('Gagal memuat sj-log:', error);
             $('#cartContent').html(
-              '<div class="text-red-500">Gagal memuat data log.</div>'
+              '
+			<div class="text-red-500">Gagal memuat data log.</div>'
             );
           }
         );
         */
-
         $('#btnCart').on('click', () => {
           renderCart(dataLog);
           openModal('cartModal');
         });
-
         $('#modalListAccGudangBtn').on('click', () => {
-          const dtAccWh = _.filter(
-            dataLog,
-            (i) => i.done === 1 && i.mkt === 'Toko'
-          );
-          
-          const listItem = dtAccWh
-            .map((i) => `
-              <div class='acc-gudang-item mb-4'>
-                <div class="bg-white rounded-lg shadow-sm border p-4">
-                  <div class="flex justify-between items-center mb-2">
-                    <span class='font-bold item-id'>${i.idStock}</span>
-                    <span class='capitalize text-gray-500 text-sm item-name'>${i.k}</span>
-                  </div>
-                  <div class="grid grid-cols-3 gap-4">
-                    <div>
-                      <div class="grid grid-cols-3 gap-1 item-details">
-                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.ltrl}</span>
-                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.rkkl}</span>
-                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded">${i.q}</span>
-                      </div>
-                      <div class="text-sm text-gray-500 item-date">
+          const dtAccWh = _.filter(dataLog,
+            (i) => i.done === 1 && i.mkt === 'Toko');
+          const listItem = dtAccWh.map((i) => `
+              
+			<div class='acc-gudang-item mb-4'>
+				<div class="bg-white rounded-lg shadow-sm border p-4">
+					<div class="flex justify-between items-center mb-2">
+						<span class='font-bold item-id'>${i.idStock}</span>
+						<span class='capitalize text-gray-500 text-sm item-name'>${i.k}</span>
+					</div>
+					<div class="grid grid-cols-3 gap-4">
+						<div>
+							<div class="grid grid-cols-3 gap-1 item-details">
+								<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-center">${i.ltrl}</span>
+								<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-center">${i.rkkl}</span>
+								<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-center">${i.q}</span>
+							</div>
+							<div class="text-sm text-gray-500 item-date">
                         ${toReadableDate(i.dt_m)}
                       </div>
-                    </div>
-                    <div class="col-span-2">
-                      <input data-key="${i.key}" placeholder="Mutasi Ke Rak . . . ." class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 input-mutasi">
-                    </div>
-                  </div>
-                </div>
-              </div>
-            `)
-            .join('');
-
+						</div>
+						<div class="col-span-2 relative">
+							<input data-key="${i.key}" placeholder="Mutasi Ke Rak . . . ." class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 input-mutasi">
+								<!-- Tombol save -->
+								<button 
+                        type="button" 
+                        class="absolute right-2 top-1/2 -translate-y-1/2 text-red-100 me-1 cursor-not-allowed save-location"
+                        disabled
+                      >
+									<svg
+										xmlns="http://www.w3.org/2000/svg" 
+                            class="w-8 h-8" fill="currentColor" 
+                            viewBox="0 0 16 16">
+										<path d="M0 1.5A1.5 1.5 0 0 1 1.5 0H3v5.5A1.5 1.5 0 0 0 4.5 7h7A1.5 1.5 0 0 0 13 5.5V0h.086a1.5 1.5 0 0 1 1.06.44l1.415 1.414A1.5 1.5 0 0 1 16 2.914V14.5a1.5 1.5 0 0 1-1.5 1.5H14v-5.5A1.5 1.5 0 0 0 12.5 9h-9A1.5 1.5 0 0 0 2 10.5V16h-.5A1.5 1.5 0 0 1 0 14.5z"/>
+										<path d="M3 16h10v-5.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5zm9-16H4v5.5a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5zM9 1h2v4H9z"/>
+									</svg>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+            `).join('');
           $('#listAccGudang').html(listItem);
-          openModal('modalListAccGudang');
+          openModalListAccGudang('modalListAccGudang');
         });
       });
 
@@ -472,7 +437,6 @@
         const gdMax = parseInt($('#gdMax').val(), 10);
         const tkMin = parseInt($('#tkMin').val(), 10);
         const tkMax = parseInt($('#tkMax').val(), 10);
-
         const rangeGd = [
           isNaN(gdMin) ? Number.MIN_SAFE_INTEGER : gdMin,
           isNaN(gdMax) ? Number.MAX_SAFE_INTEGER : gdMax,
@@ -481,7 +445,6 @@
           isNaN(tkMin) ? Number.MIN_SAFE_INTEGER : tkMin,
           isNaN(tkMax) ? Number.MAX_SAFE_INTEGER : tkMax,
         ];
-
         const filtered = filterDtStGr(rangeGd, rangeTk);
         const finalResult = searchByK(keyword, filtered);
         renderStockGroupList(finalResult);
@@ -490,56 +453,49 @@
       function renderCart(data) {
         const $cartContent = $('#cartContent');
         if (!data) {
-          $cartContent.html(
-            '<div class="text-yellow-500">Tidak ada data pada sj-log.</div>'
-          );
+          $cartContent.html(' < div class = "text-yellow-500" > Tidak ada data pada sj - log. < /div>');
           return;
         }
-
         const filtered = Object.entries(data).filter(
-          ([key, item]) => item.mkt === 'Toko' && parseInt(item.done, 10) === 0
-        );
-
+          ([key, item]) => item.mkt === 'Toko' && parseInt(item.done, 10) === 0);
         if (filtered.length === 0) {
-          $cartContent.html(
-            '<div class="text-blue-500">Tidak ada entri Toko dengan status done = 0.</div>'
-          );
+          $cartContent.html(' < div class = "text-blue-500" > Tidak ada entri Toko dengan status done = 0. < /div>');
           return;
         }
-
-        let html = '<div class="space-y-4">';
+        let html = ' < div class = "space-y-4" > ';
         filtered.forEach(([key, item]) => {
           html += `
-            <div class="cart-item bg-white rounded-lg shadow-sm border p-4">
-              <div class="flex justify-between items-center mb-2">
-                <h3 class="text-lg font-semibold"><span class="item-id">${item.idStock}</span> | <span class="item-name capitalize ">${item.k}</span></h3>
-              </div>
-              <div class="text-sm text-gray-500 mb-2 item-details">${item.ltrl} | ${item.rkkl} | ${item.q}</div>
-              <div class="flex justify-between items-center">
-                <span class="text-sm text-gray-500 item-timestamp">${new Date(item.timestamp).toLocaleString()}</span>
-                <button class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 btnMarkDone" data-key="${key}">
+            
+					<div class="cart-item bg-white rounded-lg shadow-sm border p-4">
+						<div class="flex justify-between items-center mb-2">
+							<h3 class="text-lg font-semibold">
+								<span class="item-id">${item.idStock}</span> | 
+								<span class="item-name capitalize ">${item.k}</span>
+							</h3>
+						</div>
+						<div class="text-sm text-gray-500 mb-2 item-details">${item.ltrl} | ${item.rkkl} | ${item.q}</div>
+						<div class="flex justify-between items-center">
+							<span class="text-sm text-gray-500 item-timestamp">${new Date(item.timestamp).toLocaleString()}</span>
+							<button class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 btnMarkDone" data-key="${key}">
                   Delete
                 </button>
-              </div>
-            </div>`;
+						</div>
+					</div>`;
         });
-        html += '</div>';
+        html += ' < /div>';
         $cartContent.html(html);
-
-        $('.btnMarkDone').on('click', function () {
+        $('.btnMarkDone').on('click', function() {
           const key = $(this).data('key');
           const itemRef = ref(dbLog, `sj-log/${key}`);
           update(itemRef, {
             done: 1,
             dt_m: Date.now(),
-          })
-            .then(() => {
-              $(this).closest('.cart-item').fadeOut(() => $(this).remove());
-            })
-            .catch((err) => {
-              alert('Gagal menandai sebagai done.');
-              console.error(err);
-            });
+          }).then(() => {
+            $(this).closest('.cart-item').fadeOut(() => $(this).remove());
+          }).catch((err) => {
+            alert('Gagal menandai sebagai done.');
+            console.error(err);
+          });
         });
       }
 
@@ -559,9 +515,7 @@
       }
 
       function loadAllData() {
-        fetchAndCacheData(
-          'ms/data',
-          'https://cdn.weva.my.id/apix/data/dtStGrA',
+        fetchAndCacheData('ms/data', 'https://cdn.weva.my.id/apix/data/dtStGrA',
           (data) => {
             dataStockGroup = data;
             const range = getMinMaxGdTk(data);
@@ -570,88 +524,66 @@
             $('#tkMin').val(range.minTk);
             $('#tkMax').val(range.maxTk);
             renderStockGroupList(data);
-          }
-        );
-
-        fetchAndCacheData(
-          'ms/layer2',
-          'https://cdn.weva.my.id/apix/layer2A',
+          });
+        fetchAndCacheData('ms/layer2', 'https://cdn.weva.my.id/apix/layer2A',
           (data) => {
             dataLayer2 = data;
-          }
-        );
+          });
       }
 
       function renewAllData() {
-        if (
-          !confirm(
-            'Download ulang data terbaru dan timpa semua data di Firebase?'
-          )
-        )
-          return;
-
+        if (!confirm('Download ulang data terbaru dan timpa semua data di Firebase?')) return;
         $('#btnRenew').prop('disabled', true).text('Memperbarui...');
-
         pR('https://cdn.weva.my.id/apix/data/dtStGrA', '', (e1, d1) => {
           if (e1 || !d1 || !d1.data) {
             alert('Gagal mengambil data utama dari server.');
             $('#btnRenew').prop('disabled', false).text('Re-New Data');
             return;
           }
-
           const newData = d1.data;
-
           pR('https://cdn.weva.my.id/apix/layer2A', '', (e2, d2) => {
             if (e2 || !d2 || !d2.data) {
               alert('Gagal mengambil data layer dari server.');
               $('#btnRenew').prop('disabled', false).text('Re-New Data');
               return;
             }
-
             const newLayer = d2.data;
-
             Promise.all([
               remove(ref(db, 'ms/data')),
               remove(ref(db, 'ms/layer2')),
-            ])
-              .then(() => {
-                fbsSvcA.iDtKy('ms/data', newData, () => {
-                  fbsSvcA.iDtKy('ms/layer2', newLayer, () => {
-                    loadAllData();
-                    alert('Data berhasil diperbarui dari server.');
-                    $('#btnRenew').prop('disabled', false).text('Re-New Data');
-                  });
+            ]).then(() => {
+              fbsSvcA.iDtKy('ms/data', newData, () => {
+                fbsSvcA.iDtKy('ms/layer2', newLayer, () => {
+                  loadAllData();
+                  alert('Data berhasil diperbarui dari server.');
+                  $('#btnRenew').prop('disabled', false).text('Re-New Data');
                 });
-              })
-              .catch((err) => {
-                console.error('Gagal menghapus data lama:', err);
-                alert('Gagal menghapus data lama.');
-                $('#btnRenew').prop('disabled', false).text('Re-New Data');
               });
+            }).catch((err) => {
+              console.error('Gagal menghapus data lama:', err);
+              alert('Gagal menghapus data lama.');
+              $('#btnRenew').prop('disabled', false).text('Re-New Data');
+            });
           });
         });
       }
 
       function renderStockGroupList(data) {
         const listData = Array.isArray(data) ? data : Object.values(data);
-        const totalData = Array.isArray(dataStockGroup)
-          ? dataStockGroup.length
-          : Object.keys(dataStockGroup).length;
+        const totalData = Array.isArray(dataStockGroup) ? dataStockGroup.length : Object.keys(dataStockGroup).length;
         $('#stockSummary').text(`${listData.length} of ${totalData}`);
-
         const html = listData.map((item) => `
-          <div class="hover:bg-gray-50 cursor-pointer border-b p-3 stock-item" data-id_kain="${item.id_kain}">
-            <div class="grid grid-cols-12 gap-4">
-              <div class="col-span-3 font-medium">${item.id_kain}</div>
-              <div class="col-span-7 capitalize">${item.k}</div>
-              <div class="col-span-1 text-center">${item.gd}</div>
-              <div class="col-span-1 text-center">${item.tk}</div>
-            </div>
-          </div>
+          
+				<div class="hover:bg-gray-50 cursor-pointer border-b p-3 stock-item" data-id_kain="${item.id_kain}">
+					<div class="grid grid-cols-12 gap-4">
+						<div class="col-span-3 font-medium">${item.id_kain}</div>
+						<div class="col-span-7 capitalize">${item.k}</div>
+						<div class="col-span-1 text-center">${item.gd}</div>
+						<div class="col-span-1 text-center">${item.tk}</div>
+					</div>
+				</div>
         `).join('');
-
         $('#stockListContainer').html(html);
-
         $('.stock-item').on('click', function() {
           const idKain = $(this).data('id_kain');
           const namaKain = $(this).find('.col-span-7').text().trim();
@@ -664,9 +596,7 @@
       function filterDtStGr(rangeGd, rangeTk) {
         const [minGd, maxGd] = rangeGd;
         const [minTk, maxTk] = rangeTk;
-        const listData = Array.isArray(dataStockGroup)
-          ? dataStockGroup
-          : Object.values(dataStockGroup);
+        const listData = Array.isArray(dataStockGroup) ? dataStockGroup : Object.values(dataStockGroup);
         return listData.filter((item) => {
           const gd = parseInt(item.gd, 10);
           const tk = parseInt(item.tk, 10);
@@ -696,101 +626,80 @@
       }
 
       function showLayer2InModal(idKain, namaKain, jumlahGudang, jumlahToko) {
-        const targetData = Array.isArray(dataLayer2)
-          ? dataLayer2
-          : Object.values(dataLayer2);
+        const targetData = Array.isArray(dataLayer2) ? dataLayer2 : Object.values(dataLayer2);
         const filtered = targetData.filter((item) => item.id_kain === idKain);
-
-        const isGudang = (rak) =>
-          parseInt(rak, 10) >= 300 && parseInt(rak, 10) <= 318;
+        const isGudang = (rak) => parseInt(rak, 10) >= 300 && parseInt(rak, 10) <= 318;
         const gudangItems = filtered.filter((item) => isGudang(item.rak));
         const tokoItems = filtered.filter((item) => !isGudang(item.rak));
-
         const renderGroup = (title, items) => {
-          if (items.length === 0)
-            return `<div class="font-bold text-red-500">Tidak ada data untuk ${title}.</div>`;
+          if (items.length === 0) return `
+				<div class="font-bold text-red-500">Tidak ada data untuk ${title}.</div>`;
           return `
-            <h6 class="font-semibold mb-3">${title}</h6>
-            <div class="p-4 overflow-auto max-h-[300px]">
+            
+				<h6 class="font-semibold mb-3">${title}</h6>
+				<div class="p-4 overflow-auto max-h-[300px]">
               ${items.map((item) => `
-                <div class="bg-gray-50 p-3 rounded-lg cartable-item hover:bg-gray-100 cursor-pointer"
+                
+					<div class="bg-gray-50 p-3 rounded-lg cartable-item hover:bg-gray-100 cursor-pointer"
                     data-id="${item.id_stock}"
                     data-json='${JSON.stringify(item).replace(/'/g, '&apos;')}'
                     data-kain="${namaKain}">
-                  <div class="grid grid-cols-4 gap-4">
-                    <div>${item.id_stock}</div>
-                    <div>${item.lot} # ${item.rol}</div>
-                    <div>${item.rak} ${item.kol}</div>
-                    <div>${item.q}</div>
-                  </div>
-                </div>
+						<div class="grid grid-cols-4 gap-4">
+							<div>${item.id_stock}</div>
+							<div>${item.lot} # ${item.rol}</div>
+							<div>${item.rak} ${item.kol}</div>
+							<div>${item.q}</div>
+						</div>
+					</div>
               `).join('')}
-            </div>`;
+            
+				</div>`;
         };
-
         const content = `
-          <div class="h-full">
+          
+				<div class="h-full">
             ${renderGroup('Rak Gudang', gudangItems)}
             ${renderGroup('Rak Toko', tokoItems)}
           </div>`;
-
-        const headerText = `[${idKain}] <span class='text-blue-600 capitalize'>${namaKain}</span> [Gudang: ${jumlahGudang} — Toko: ${jumlahToko}]`;
-
+        const headerText = `[${idKain}] 
+				<span class='text-blue-600 capitalize'>${namaKain}</span> [Gudang: ${jumlahGudang} — Toko: ${jumlahToko}]`;
         $('#layer2Modal .modal-title').html(headerText);
         $('#modalLayer2Content').html(content);
         openModal('layer2Modal');
-
         fbsSvcA.gDt('ms/cart', null, (existingCart) => {
-          const existingIds = existingCart
-            ? Object.values(existingCart).map((x) => x.id_stock)
-            : [];
-
-          $('.cartable-item').each(function () {
+          const existingIds = existingCart ? Object.values(existingCart).map((x) => x.id_stock) : [];
+          $('.cartable-item').each(function() {
             const id = $(this).data('id');
             if (existingIds.includes(id)) {
-              $(this)
-                .addClass('bg-yellow-100 text-gray-500')
-                .css('pointer-events', 'none');
+              $(this).addClass('bg-yellow-100 text-gray-500').css('pointer-events', 'none');
             } else {
-              $(this)
-                .off('click')
-                .on('click', function () {
-                  const item = JSON.parse(
-                    $(this)
-                      .attr('data-json')
-                      .replace(/&apos;/g, `'`)
-                  );
-                  const timestamp = Date.now();
-
-                  const data = {
-                    cO: '0',
-                    done: 0,
-                    dt_c: stm(),
-                    dt_m: stm(),
-                    flow: 0,
-                    ge: item.stts,
-                    iMkt: '1',
-                    idKain: item.id_kain.toString(),
-                    idStock: item.id_stock.toString(),
-                    k: $(this).data('kain'),
-                    ky: 0,
-                    ltrl: item.lot + '#' + item.rol,
-                    mkt: 'Toko',
-                    q: item.q.toString(),
-                    rkkl: item.rak + ' ' + item.kol,
-                    timestamp: timestamp,
-                  };
-                  const path = 'sj-log';
-                  const dataRef = ref(dbLog, path);
-                  const value = data;
-                  (Array.isArray(value) ? value : [value]).forEach((v) =>
-                    set(push(dataRef), v)
-                  );
-                  $(this)
-                    .removeClass('bg-gray-50')
-                    .addClass('bg-green-100 text-green-800')
-                    .css('pointer-events', 'none');
-                });
+              $(this).off('click').on('click', function() {
+                const item = JSON.parse($(this).attr('data-json').replace(/&apos;/g, `'`));
+                const timestamp = Date.now();
+                const data = {
+                  cO: '0',
+                  done: 0,
+                  dt_c: stm(),
+                  dt_m: stm(),
+                  flow: 0,
+                  ge: item.stts,
+                  iMkt: '1',
+                  idKain: item.id_kain.toString(),
+                  idStock: item.id_stock.toString(),
+                  k: $(this).data('kain'),
+                  ky: 0,
+                  ltrl: item.lot + '#' + item.rol,
+                  mkt: 'Toko',
+                  q: item.q.toString(),
+                  rkkl: item.rak + ' ' + item.kol,
+                  timestamp: timestamp,
+                };
+                const path = 'sj-log';
+                const dataRef = ref(dbLog, path);
+                const value = data;
+                (Array.isArray(value) ? value : [value]).forEach((v) => set(push(dataRef), v));
+                $(this).removeClass('bg-gray-50').addClass('bg-green-100 text-green-800').css('pointer-events', 'none');
+              });
             }
           });
         });
@@ -804,9 +713,7 @@
         const pad = (n) => String(n).padStart(2, '0');
         return `${dt.getFullYear()}-${pad(dt.getMonth() + 1)}-${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}:${pad(dt.getSeconds())}`;
       }
-
-      $(()=>{
-      })
+      $(() => {})
     </script>
   </body>
 </html>
