@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DATA — Grosir</title>
+    <title>xDATA — Grosir</title>
     <link rel="icon" href="https://cdn-icons-png.freepik.com/512/628/628300.png" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -35,7 +35,7 @@
         <div class="w-32">
           <div id="stockSummary" class="text-sm text-gray-500 font-mono text-center"> 0000 of 0000 </div>
         </div>
-        <button id="modalListAccGudangBtn" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"> Acc Gudang </button>
+        <button id= "modalListAccGudangBtn" class="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"> Acc Gudang </button>
         <input id="searchInput" type="text" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Pencarian ID/Nama (contoh: 24s com ken ku)" />
         <input id="gdMin" type="number" class="w-24 px-4 py-2 border border-gray-300 rounded-lg" placeholder="Gd Min" />
         <input id="gdMax" type="number" class="w-24 px-4 py-2 border border-gray-300 rounded-lg" placeholder="Gd Max" />
@@ -53,8 +53,14 @@
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-3">Id</div>
             <div class="col-span-7">Nama</div>
-            <div class="col-span-1 text-center">Gudang</div>
-            <div class="col-span-1 text-center">Toko</div>
+            <div class="col-span-1 text-center">
+              <span class="block md:hidden">G</span>
+              <span class="hidden md:block">Gudang</span>              
+            </div>
+            <div class="col-span-1 text-center">
+              <span class="block md:hidden">T</span>
+              <span class="hidden md:block">Toko</span>
+            </div>
           </div>
         </div>
         <div id="stockListContainer" class="overflow-auto max-h-[500px]"></div>
@@ -225,11 +231,83 @@
         }
       }
 
+      function dtSo(idStock) {
+        return new Promise((resolve, reject) => {
+          pR('https://cdn.weva.my.id/apix/dtSo', {id: idStock}, (e, d) => {
+            if (e) return reject(e);
+            if (d && d.data && d.data.length > 0) {
+              resolve(d.data[0]);
+            } else {
+              resolve(null);
+            }
+          });
+        });
+      }
+
+      function dtSoHst(idStock) {
+        return new Promise((resolve, reject) => {
+          pR('https://cdn.weva.my.id/apix/dtSoHst', {id: idStock}, (e, d) => {
+            if (e) return reject(e);
+            if (d && d.data && d.data.length > 0) {
+              resolve(d.data[0]);
+            } else {
+              resolve(null);
+            }
+          });
+        });
+      }
+
+
+      async function fetchSoAndHistory(idStock) {
+        try {
+          const so = await dtSo(idStock);
+          const soHst = await dtSoHst(idStock);
+
+          // console.log("SO:", so);
+          // console.log("SO History:", soHst);
+
+          return {
+            so,
+            soHst
+          };
+        } catch (error) {
+          console.error("Gagal mengambil data:", error);
+          return null;
+        }
+      }
+
+
+      const fetchSoAndHistoryFx = (idStock, callback) => {
+        fetchSoAndHistory(idStock)
+          .then(rs => {
+            console.log(rs);
+
+            if (!rs || (!rs.soHst && !rs.so)) {
+              callback(null, null);
+            } else if (rs.soHst) {
+              callback(null, {
+                data: rs.soHst,
+                sumber: "data so hst"
+              });
+            } else if (rs.so) {
+              callback(null, {
+                data: rs.so,
+                sumber: "data so"
+              });
+            }
+          })
+          .catch(err => {
+            callback(err, null);
+          });
+      };
+
+
+
       function openModalListAccGudang(modalId) {
         openModal(modalId, () => {
           /**
-           * Pengaturan Listener Untuk Validasi Lokasi
-           * **/
+           * Pengaturan Listener Untuk Validasi Lokasi 
+          **/
           $('.input-mutasi').on('focus', function() {
             $('.input-mutasi:not([disabled])').val('');
           });
@@ -266,7 +344,7 @@
                 alert("Lokasi Error!");
                 $(this).val('');
               }
-              4
+              // 4
               // tambahkan aksi lain di sini
             }
           });
@@ -275,7 +353,42 @@
             // console.log(valDt);
             const dataPick = _.filter(dataLog, i => i.key === valDt);
             const dataVal = dataPick.length == 0 ? null : dataPick[0];
-            console.log(dataVal);
+            const idStock = dataPick.length == 0 ? null : dataPick[0].idStock;
+            // console.log([valDt,dataPick,dataVal]);
+            console.log(idStock);
+            // fetchSoAndHistory(dataVal.idStock).then(result => {
+            //   console.log(result);
+            // });
+            fetchSoAndHistoryFx(idStock, (err, result) => {
+              if (err) {
+                console.error("Error:", err);
+              } else {
+                console.log(result);
+              }
+            });
+
+            /*
+             pick properti ini, khusus untuk tgl_hst dan pic_hst di isi manual string di code
+             lalu q_so_sup dan q_so_nett di isi null saja, hlp juga null,
+{
+  "id_so_hst": 12448,
+  "tgl_hst": "2024-07-11T03:33:59.000Z",
+  "pic_hst": 1,
+  "id_progres": null,
+
+  "id_so": 5867,
+  "tgl_so": "2024-07-11T02:23:47.000Z",
+  "pic": 7,
+  "hlp": 2,
+  "ge": "g",
+  "id_stock": 2345,
+  "kd_rak": 1,
+  "kd_kol": 11,
+  "q_so": "25.90"
+}
+            */
+
+            
           })
         });
       }
@@ -394,8 +507,8 @@
 						<span class='font-bold item-id'>${i.idStock}</span>
 						<span class='capitalize text-gray-500 text-sm item-name'>${i.k}</span>
 					</div>
-					<div class="grid grid-cols-3 gap-4">
-						<div>
+					<div class="grid grid-cols-1 md:grid-cols-3 lg:gap-4">
+						<div class="mb-4 md:mb-0">
 							<div class="grid grid-cols-3 gap-1 item-details">
 								<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-center">${i.ltrl}</span>
 								<span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-center">${i.rkkl}</span>
@@ -462,11 +575,10 @@
           $cartContent.html(' < div class = "text-blue-500" > Tidak ada entri Toko dengan status done = 0. < /div>');
           return;
         }
-        let html = ' < div class = "space-y-4" > ';
-        filtered.forEach(([key, item]) => {
-          html += `
-            
-					<div class="cart-item bg-white rounded-lg shadow-sm border p-4">
+        console.log(filtered);
+        const htmlx = _.map(filtered,(v,k)=>{
+          const item = v[1];
+          return `<div class="cart-item bg-white rounded-lg shadow-sm border p-4">
 						<div class="flex justify-between items-center mb-2">
 							<h3 class="text-lg font-semibold">
 								<span class="item-id">${item.idStock}</span> | 
@@ -476,26 +588,34 @@
 						<div class="text-sm text-gray-500 mb-2 item-details">${item.ltrl} | ${item.rkkl} | ${item.q}</div>
 						<div class="flex justify-between items-center">
 							<span class="text-sm text-gray-500 item-timestamp">${new Date(item.timestamp).toLocaleString()}</span>
-							<button class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 btnMarkDone" data-key="${key}">
+							<button class="px-3 py-1 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 btnMarkDone" data-key="${item.key}">
                   Delete
                 </button>
 						</div>
-					</div>`;
-        });
-        html += ' < /div>';
-        $cartContent.html(html);
+					</div>`
+        }).join('');
+        
+        $cartContent.html(`<div class = "space-y-4">${htmlx}</div>`);
         $('.btnMarkDone').on('click', function() {
           const key = $(this).data('key');
           const itemRef = ref(dbLog, `sj-log/${key}`);
-          update(itemRef, {
-            done: 1,
-            dt_m: Date.now(),
-          }).then(() => {
+          fbsSvcB.upd(`sj-log/${key}`,'',{
+            done : 2,
+            dt_m : stm()
+          },(d)=>{
             $(this).closest('.cart-item').fadeOut(() => $(this).remove());
-          }).catch((err) => {
-            alert('Gagal menandai sebagai done.');
-            console.error(err);
-          });
+          })
+
+          // update(itemRef, {
+          //   done: 2,
+          //   dt_m: Date.now(),
+          // }).then(() => {
+          //   console.log("delete");
+          //   $(this).closest('.cart-item').fadeOut(() => $(this).remove());
+          // }).catch((err) => {
+          //   alert('Gagal menandai sebagai done.');
+          //   console.error(err);
+          // });
         });
       }
 
