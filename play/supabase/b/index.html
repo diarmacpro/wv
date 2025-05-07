@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>List Bucket Private (Raw Response)</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <h1>Upload File ke Bucket Supabase</h1>
+  <input type="file" id="fileInput">
+  <button onclick="uploadFile()">Upload</button>
+
+  <pre id="result"></pre>
+  <script>
+    const client = supabase.createClient(
+      'https://aykiaurmwondqglgqojr.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5a2lhdXJtd29uZHFnbGdxb2pyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjI4OTgxMywiZXhwIjoyMDYxODY1ODEzfQ.T6eEwHS9ZwoE6N_DUkCZKoffaSLaEtrY7ryoY2pu3Y0'
+    );
+
+    async function uploadFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert("Silakan pilih file terlebih dahulu.");
+        return;
+      }
+
+      const filePath = `public/${file.name}`; // path lengkap di bucket
+      const { data, error } = await client.storage
+        .from('storage-a') // ganti 'avatars' sesuai nama bucket
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false // jangan timpa jika sudah ada
+        });
+
+      const result = document.getElementById('result');
+      if (error) {
+        console.error('Upload error:', error);
+        result.textContent = 'Upload gagal: ' + error.message;
+      } else {
+        console.log('Upload sukses:', data);
+        result.textContent = 'Upload sukses: ' + JSON.stringify(data, null, 2);
+      }
+    }
+
+    async function getFiles(bucket, path = '', option = {}, search = '', callback) {
+      const finalOptions = {
+        limit: option.limit || 100,
+        offset: option.offset || 0,
+        sortBy: option.sortBy || { column: 'name', order: 'asc' },
+      };
+      if (search) { finalOptions.search = search; }
+      const { data, error } = await client.storage.from(bucket).list(path, finalOptions);
+      if (typeof callback === 'function') { callback(data, error); }
+    }
+
+    getFiles( 'storage-a', 'data', { limit: 50 }, '', function (data, err) {
+        if (err) {
+          console.error('Error: ' + err.message);
+        } else {
+          console.log(data);
+        }
+      }
+    );
+  </script>
+</body>
+</html>

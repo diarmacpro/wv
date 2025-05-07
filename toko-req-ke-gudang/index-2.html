@@ -233,7 +233,7 @@
 
       function dtStk(idStock){
         return new Promise((resolve, reject) => {
-          pR('https://cdn.weva.my.id/apix/dtStkA', {id: idStock}, (e, d) => {
+          pR('https://cdn.weva.my.id/apix/dtStk', {id: idStock}, (e, d) => {
             if (e) return reject(e);
             if (d && d.data && d.data.length > 0) {
               resolve(d.data[0]);
@@ -271,10 +271,8 @@
       }
 
 
-/*      
       async function fetchSoAndHistory(idStock) {
         try {
-          const main = await dtStk(idStock); 
           const so = await dtSo(idStock);
           const soHst = await dtSoHst(idStock);
 
@@ -282,7 +280,6 @@
           // console.log("SO History:", soHst);
 
           return {
-            main,
             so,
             soHst
           };
@@ -299,16 +296,14 @@
             console.log(rs);
 
             if (!rs || (!rs.soHst && !rs.so)) {
-              callback(null,null, null);
+              callback(null, null);
             } else if (rs.soHst) {
               callback(null, {
-                main: rs.main,
                 data: rs.soHst,
                 sumber: "data so hst"
               });
             } else if (rs.so) {
               callback(null, {
-                main: rs.main,
                 data: rs.so,
                 sumber: "data so"
               });
@@ -318,40 +313,6 @@
             callback(err, null);
           });
       };
-*/
-
-
-
-async function fetchSoAndHistory(idStock, callback) {
-  try {
-    const main = await dtStk(idStock); 
-    const so = await dtSo(idStock);
-    const soHst = await dtSoHst(idStock);
-
-    const result = { main, so, soHst };
-    console.log(result);
-
-    if (!soHst && !so) {
-      callback(null, null, null);
-    } else if (soHst) {
-      callback(null, {
-        main,
-        data: soHst,
-        sumber: "data so hst"
-      });
-    } else {
-      callback(null, {
-        main,
-        data: so,
-        sumber: "data so"
-      });
-    }
-  } catch (error) {
-    console.error("Gagal mengambil data:", error);
-    callback(error, null);
-  }
-}
-
 
 
 
@@ -411,7 +372,7 @@ async function fetchSoAndHistory(idStock, callback) {
             // fetchSoAndHistory(dataVal.idStock).then(result => {
             //   console.log(result);
             // });
-            fetchSoAndHistory(idStock, (err, result) => {
+            fetchSoAndHistoryFx(idStock, (err, result) => {
               if (err) {
                 console.error("Error:", err);
               } else {
@@ -526,8 +487,24 @@ async function fetchSoAndHistory(idStock, callback) {
           (error) => {
             console.error('Gagal memuat sj-log:', error);
             $('#cartContent').html(' < div class = "text-red-500" > Gagal memuat data log. < /div>');
+          });
+        /*
+        onValue(
+          sjLogRef,
+          (snapshot) => {
+            dataLog = snapshot.val();
+            console.log(dataLog);
+            $('#modalListAccGudangBtn').removeClass('disabled:opacity-50 disabled:cursor-not-allowed');
+          },
+          (error) => {
+            console.error('Gagal memuat sj-log:', error);
+            $('#cartContent').html(
+              '
+			<div class="text-red-500">Gagal memuat data log.</div>'
+            );
           }
         );
+        */
         $('#btnCart').on('click', () => {
           renderCart(dataLog);
           openModal('cartModal');

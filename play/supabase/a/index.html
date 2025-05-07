@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Supabase File Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4">Supabase File Manager</h1>
+
+    <!-- Upload File -->
+    <div class="mb-4 flex items-center gap-4">
+      <input type="file" id="uploader" class="border p-2 rounded" />
+      <button id="uploadBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Upload</button>
+    </div>
+
+    <!-- File List -->
+    <div id="file-list" class="space-y-4"></div>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+
+    const supabaseUrl = 'https://aykiaurmwondqglgqojr.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5a2lhdXJtd29uZHFnbGdxb2pyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODk4MTMsImV4cCI6MjA2MTg2NTgxM30.j0st0sJv7O-_YykDIMdM-1Ya18senxYyLlMbfwX0nwE';
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    const bucket = 'storage-a';
+    window.supabase = supabase;
+
+    const list = async () => {
+      const { data, error } = await supabase.storage.from(bucket).list('', { limit: 1000 });
+      if (error) throw error;
+      return data;
+    };
+    window.list = list;
+
+    const rename = async (oldPath, newName) => {
+      const newPath = newName;
+      const { error: copyError } = await supabase.storage.from(bucket).copy(oldPath, newPath);
+      if (copyError) throw copyError;
+      const { error: deleteError } = await supabase.storage.from(bucket).remove([oldPath]);
+      if (deleteError) throw deleteError;
+    };
+    window.rename = rename;
+
+    const deleteFile = async (path) => {
+      const { error } = await supabase.storage.from(bucket).remove([path]);
+      if (error) throw error;
+    };
+    window.deleteFile = deleteFile;
+
+    const properties = async (path) => {
+      const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 60);
+      if (error) throw error;
+      const res = await fetch(data.signedUrl);
+      const blob = await res.blob();
+      const size = blob.size;
+      const type = blob.type;
+      const lastModified = res.headers.get("last-modified");
+      return { path, size, type, lastModified, url: data.signedUrl };
+    };
+    window.properties = properties;
+
+    const uploadFile = async () => {
+      const fileInput = document.getElementById('uploader');
+      const file = fileInput.files[0];
+      if (!file) return alert('Pilih file terlebih dahulu');
+      const { error } = await supabase.storage.from(bucket).upload(file.name, file, { upsert: true });
+      if (error) return alert('Upload gagal: ' + error.message);
+      fileInput.value = '';
+      await loadFiles();
+    };
+    window.uploadFile = uploadFile;
+
+    const handleDelete = async (path) => {
+      if (!confirm(`Yakin hapus "${path}"?`)) return;
+      try {
+        await deleteFile(path);
+        await loadFiles();
+      } catch (err) {
+        alert('Gagal hapus: ' + err.message);
+      }
+    };
+    window.handleDelete = handleDelete;
+
+    const handleRename = async (path) => {
+      const input = document.getElementById(`rename-${cssSafe(path)}`);
+      const newName = input.value.trim();
+      if (!newName) return alert('Nama baru tidak boleh kosong');
+      try {
+        await rename(path, newName);
+        await loadFiles();
+      } catch (err) {
+        alert('Gagal rename: ' + err.message);
+      }
+    };
+    window.handleRename = handleRename;
+
+    const cssSafe = (name) => name.replace(/[^a-zA-Z0-9-_]/g, '_');
+    window.cssSafe = cssSafe;
+
+    const loadFiles = async () => {
+      const container = document.getElementById('file-list');
+      container.innerHTML = '';
+      try {
+        const files = await list();
+        if (!files || files.length === 0) {
+          container.innerHTML = '<p>Tidak ada file.</p>';
+          return;
+        }
+
+        for (const file of files) {
+          const id = cssSafe(file.name);
+          const div = document.createElement('div');
+          div.className = "bg-gray-50 p-4 rounded shadow flex items-center justify-between flex-wrap";
+          div.innerHTML = `
+            <div class="mb-2 sm:mb-0">
+              <p class="font-medium">${file.name}</p>
+              <div class="text-sm text-gray-600" id="props-${id}">Loading...</div>
+            </div>
+            <div class="flex gap-2">
+              <input type="text" placeholder="Rename to" class="border rounded p-1" id="rename-${id}">
+              <button onclick="handleRename('${file.name}')" class="bg-yellow-500 text-white px-2 py-1 rounded">Rename</button>
+              <button onclick="handleDelete('${file.name}')" class="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+            </div>
+          `;
+          container.appendChild(div);
+
+          try {
+            const props = await properties(file.name);
+            const el = document.getElementById(`props-${id}`);
+            el.innerHTML = `Size: ${props.size} bytes | Type: ${props.type} | Modified: ${props.lastModified} | <a href="${props.url}" target="_blank" class="text-blue-500 underline">Preview</a>`;
+          } catch {
+            const el = document.getElementById(`props-${id}`);
+            el.textContent = "Gagal mengambil info";
+          }
+        }
+      } catch (err) {
+        container.innerHTML = `<p class="text-red-500">${err.message}</p>`;
+      }
+    };
+    window.loadFiles = loadFiles;
+
+    window.handleDelete = handleDelete;
+    window.handleRename = handleRename;
+
+    document.getElementById('uploadBtn').addEventListener('click', uploadFile);
+
+    loadFiles();
+  </script>
+</body>
+</html>
