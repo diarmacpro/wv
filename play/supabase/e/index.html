@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+		<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+		<script>
+
+		// saat create folder maka beri file '".emptyFolderPlaceholder"' dengan seluruh struktur meta didalamnya
+
+			let supabaseClient;
+			let data = {}; // pastikan data adalah objek
+		
+			$(async () => { // gunakan async di sini
+				supabaseClient = supabase.createClient(
+					'https://aykiaurmwondqglgqojr.supabase.co',
+					'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF5a2lhdXJtd29uZHFnbGdxb2pyIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0NjI4OTgxMywiZXhwIjoyMDYxODY1ODEzfQ.T6eEwHS9ZwoE6N_DUkCZKoffaSLaEtrY7ryoY2pu3Y0'
+				);
+		
+				const { data: list, error } = await supabaseClient
+					.storage
+					.from('storage-a')
+					.list('', {
+						limit: 100,
+						offset: 0,
+						sortBy: { column: 'name', order: 'asc' },
+					});
+		
+				if (error) {
+					console.error('Gagal mengambil daftar file:', error.message);
+				} else {
+					data.listFile = list;
+					console.log('File ditemukan:', data.listFile);
+				}
+			});
+		</script>		
+  </body>
+</html>

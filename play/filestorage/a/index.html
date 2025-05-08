@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GoFile Manager</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-4">
+  <div class="max-w-4xl mx-auto">
+    <div class="mb-4 flex justify-between items-center">
+      <div id="breadcrumbs" class="text-sm text-blue-600 font-semibold"></div>
+      <div class="space-x-2">
+        <input type="file" id="uploadInput" class="hidden" />
+        <button onclick="document.getElementById('uploadInput').click()" class="bg-blue-500 text-white px-3 py-1 rounded">Upload</button>
+        <button onclick="createFolderPrompt()" class="bg-green-500 text-white px-3 py-1 rounded">New Folder</button>
+      </div>
+    </div>
+
+    <div id="fileList" class="bg-white shadow rounded p-4"></div>
+  </div>
+
+  <script>
+    let currentFolderId = '9b598dd5-2035-4be3-b1e1-66f0cdf2c8c8';
+    const accountToken = 'mmM1cnWLMhij0bTTYfj2vp36hm0jeTb7';
+    const wt = '4fd6sg89d7s6';
+    const breadcrumbs = [{ id: currentFolderId, name: 'Home' }];
+    const allDataCache = {}; // global cache of all folders and files
+
+    async function fetchAndDisplayRoot() {
+      const res = await fetch(`https://api.gofile.io/contents/${currentFolderId}?wt=${wt}`, {
+        headers: { 'Authorization': `Bearer ${accountToken}` }
+      });
+      const data = await res.json();
+      if (data.status !== 'ok' || !data.data || !data.data.children) {
+        document.getElementById('fileList').innerHTML = '<p class="text-red-500">Failed to load root folder.</p>';
+        return;
+      }
+
+      const rootChildren = data.data.children;
+      const result = {};
+      for (const [id, item] of Object.entries(rootChildren)) {
+        result[id] = item;
+      }
+      allDataCache[currentFolderId] = result;
+
+      renderBreadcrumbs();
+      renderFiles(result);
+
+      // lanjutkan silent recursive setelah root ditampilkan
+      fetchAllRecursively(currentFolderId);
+    }
+
+    async function fetchAllRecursively(folderId) {
+      if (allDataCache[folderId]) {
+        const existing = allDataCache[folderId];
+        const result = {};
+        for (const [id, item] of Object.entries(existing)) {
+          if (item.type === 'folder' && !item.children) {
+            const res = await fetch(`https://api.gofile.io/contents/${id}?wt=${wt}`, {
+              headers: { 'Authorization': `Bearer ${accountToken}` }
+            });
+            const data = await res.json();
+            if (data.status === 'ok' && data.data && data.data.children) {
+              item.children = data.data.children;
+              allDataCache[id] = data.data.children;
+              await fetchAllRecursively(id);
+            }
+          }
+          result[id] = item;
+        }
+        allDataCache[folderId] = result;
+      }
+    }
+
+    function renderBreadcrumbs() {
+      const container = document.getElementById('breadcrumbs');
+      container.innerHTML = breadcrumbs.map((b, i) => `
+        <span class="cursor-pointer hover:underline" onclick="goToBreadcrumb(${i})">${b.name}</span>
+      `).join(' / ');
+    }
+
+    function goToBreadcrumb(index) {
+      breadcrumbs.splice(index + 1);
+      currentFolderId = breadcrumbs[breadcrumbs.length - 1].id;
+      renderBreadcrumbs();
+      renderFiles(allDataCache[currentFolderId] || {});
+    }
+
+    function renderFiles(contents) {
+      const list = document.getElementById('fileList');
+      const entries = Object.values(contents || {});
+      if (entries.length === 0) {
+        list.innerHTML = '<p class="text-gray-500">Folder is empty.</p>';
+        return;
+      }
+
+      list.innerHTML = entries.map(item => `
+        <div class="flex justify-between items-center py-2 border-b">
+          <div class="cursor-pointer" onclick="${item.type === 'folder' ? `enterFolder('${item.id}', '${item.name}')` : `window.open('${item.link || '#'}', '_blank')`}">
+            ${item.type === 'folder' ? '📁' : '📄'} ${item.name}
+          </div>
+          <div class="space-x-2">
+            ${item.type !== 'folder' && item.link ? `<a href="${item.link}" download class="text-blue-600">Download</a>` : ''}
+            <button onclick="deleteItem('${item.id}')" class="text-red-500">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function enterFolder(id, name) {
+      breadcrumbs.push({ id, name });
+      currentFolderId = id;
+      renderBreadcrumbs();
+      renderFiles(allDataCache[currentFolderId] || {});
+    }
+
+    function createFolderPrompt() {
+      const name = prompt('Enter folder name:');
+      if (name) {
+        fetch('https://api.gofile.io/contents/createFolder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accountToken}`
+          },
+          body: JSON.stringify({
+            parentFolderId: currentFolderId,
+            folderName: name
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.status === 'ok') {
+            allDataCache[data.data.id] = {}; // pre-store empty
+            delete allDataCache[currentFolderId]; // refresh parent cache
+            fetchAndDisplayRoot();
+          } else {
+            alert('Failed to create folder.');
+          }
+        })
+        .catch(() => alert('Error creating folder.'));
+      }
+    }
+
+    document.getElementById('uploadInput').addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('folderId', currentFolderId);
+
+      fetch('https://api.gofile.io/uploadFile', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${accountToken}` },
+        body: formData
+      })
+      .then(res => res.json())
+      .then(() => {
+        delete allDataCache[currentFolderId]; // refresh cache
+        fetchAndDisplayRoot();
+      });
+    });
+
+    function deleteItem(itemId) {
+      if (confirm('Are you sure you want to delete this item?')) {
+        fetch('https://api.gofile.io/deleteContent', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${accountToken}` },
+          body: JSON.stringify({ contentsId: [itemId] })
+        })
+        .then(res => res.json())
+        .then(() => {
+          delete allDataCache[currentFolderId];
+          fetchAndDisplayRoot();
+        });
+      }
+    }
+
+    fetchAndDisplayRoot();
+  </script>
+</body>
+</html>
