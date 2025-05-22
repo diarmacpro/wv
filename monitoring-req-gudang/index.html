@@ -398,7 +398,14 @@
 
           const setDoneStatus = (key, status) => {
             if (!key) return;
-            fbsA.upd(`sj-log/${key}`, null, { done: status }, () => {
+            fbsA.upd(`sj-log/${key}`, null, {
+               done: status,
+               dt_m: stm()
+            }, () => {
+              console.log({
+               done: status,
+               dt_m: stm()
+            });
               renderAllData();
               renderDoneList();
             });
