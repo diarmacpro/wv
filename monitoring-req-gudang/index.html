@@ -375,7 +375,10 @@
               </div>
               <div class="text-gray-800 mb-2 flex justify-between">
                 <div class="text-gray-500">${fields.k}</div>
-                <button class="px-1 py-0 rounded-lg text-sm font-medium border transition ${item.done === 1 ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100' : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'}" onclick="${item.done === 1 ? '' : `showModalListIdStock('${encodeURIComponent(key)}', '${encodeURIComponent(item.idKain)}')`}">
+                <button class="px-1 py-0 rounded-lg text-sm font-medium border transition ${item.done === 1 ? 'bg-red-50 text-red-600 border-red-100 hover:bg-red-100' : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100'}" x="${item.done}" onclick="${
+                  item.done === 1 ? ''
+                  : `showModalListIdStock('${encodeURIComponent(key)}', '${encodeURIComponent(item.idKain)}')`
+                }">
                 ${item.done === 1 ? 'Hapus' : `Ganti Id`}
                 </button>
               </div>
