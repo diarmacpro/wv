@@ -206,6 +206,36 @@
        keyAktif = undefined;
        $('#listIdStockByKain').addClass('hidden');
      }
+
+      function ambilDataKy(data) {
+        return data
+          .filter(item => item.ky !== 0 && (item.idSj == null || !('idSj' in item)))
+          .map(item => item.ky)
+          .join();
+      }
+
+
+      function ambilDataSj(kyListString, callback) {
+        pR('https://cdn.weva.my.id/apix/dataKySj', { ky: kyListString }, (err, res) => {
+          if (err) {
+            console.error('[fetchKyData] Error:', err);
+            return callback(err, null);
+          }
+          callback(null, res.data);
+        });
+      }
+
+      function getDataSj(){
+        ambilDataSj(ambilDataKy(allData), (e, d) => {
+          console.log(d);
+        });
+      }
+
+      // $(()=>{
+      //   fetchKyData(getKyListToFetch(allData), (e, d) => {
+      //     console.log(d);
+      //   });
+      // })
     </script>
 
     <script type="module">
