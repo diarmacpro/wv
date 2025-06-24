@@ -94,7 +94,7 @@
           <!-- Search Box -->
           <div class="mt-4 pb-4">
             <div class="relative">
-              <input type="text" id="searchDoneBox" placeholder="Cari di list Done" class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50" />
+              <input type="text" id="searchDoneBox" placeholder="Cari di list Done" class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50" autocomplete="off"/>
               <button id="clearSearchDone" class="absolute right-3 top-3 text-gray-400 hover:text-red-500 text-lg hidden">&times;</button>
             </div>
           </div>
@@ -506,7 +506,7 @@
               const geCondition = cO === 0;
               const rak = getRakFromRkkl(item.rkkl);
               const isWithinRakRange = rak !== null && rak >= rakMin && rak <= rakMax;
-              const matchesKeywords = keywords.every(k => [item.k, item.idStock, item.mkt, item.ltrl, item.ge, item.rkkl, item.idKain, item.q, item.ky].join(' ').toLowerCase().includes(k));
+              const matchesKeywords = keywords.every(k => [item.k, item.idStock, item.idSj, item.mkt, item.ltrl, item.ge, item.rkkl, item.idKain, item.q, item.ky].join(' ').toLowerCase().includes(k));
               return isDone && geCondition && isWithinRakRange && matchesKeywords;
             });
             const container = $('#doneItemList');
@@ -547,7 +547,7 @@
 
             fbsA.gDtOn('sj-log', snapshot => {
               const data = snapshot.val();
-              console.log(data);
+              // console.log(data);
               const newKeys = data ? Object.keys(data) : [];
               const isNew = lastKeySnapshot.length > 0 && newKeys.length > lastKeySnapshot.length;
               lastKeySnapshot = newKeys;
@@ -636,7 +636,7 @@
 
       function gtSjByCekKy() {
         const kyList = allData
-          .filter(item => item.ky !== 0 && (item.idSj == null || !('idSj' in item)))
+          .filter(item => item.ky !== 0 && (item.idSj == null || !('idSj' in item)) && item.done !== 4)
           .map(item => item.ky);
 
         if (kyList.length > 0) {
@@ -657,22 +657,52 @@
       }
 
       function cekDanAmbilKyData() {
-        console.log("Fungsi Cek Dijalankan!");
+        // console.log("Fungsi Cek Dijalankan!");
         setTimeout(() => {
           const lstKy = allData
-          .filter(i => i.ky && (i.idSj == null || !('idSj' in i)))
+          .filter(i => i.ky && (i.idSj == null || !('idSj' in i)) && i.done !== 4)
           .map(i => i.ky);
-          if (lstKy.length === 0) { console.log('Tidak ada KY yang perlu dicek.'); return; }
-          pR('https://cdn.weva.my.id/apix/dataKySj', { ky: lstKy.join() }, (err, res) => {
-            if (err) { console.error('Gagal mengambil data:', err); return; }
-            const resDt = _.map(res.data, (v) => {
-              const dtObj = _.find(allData, i => i.ky == v.ky);
-              return { key: dtObj?.key || null, ky: v.ky, idSj: v.id_sj };
+          if (lstKy.length === 0) {
+            // console.log('Tidak ada KY yang perlu dicek.');
+            return;
+          }else{
+            alert('Terdeteksi Update Nomor SJ!');
+          }
+          console.log(lstKy);
+          pR('https://cdn.weva.my.id/apix/dataKySj', { ky: lstKy.join() },
+            (err, res) => {
+              if (err) {
+                console.error('Gagal mengambil data:', err);
+                return;
+              }
+              const resDt = _.map(res.data, (v) => {
+                const dtObj = _.find(allData, i => i.ky == v.ky);
+                return { key: dtObj?.key || null, ky: v.ky, idSj: v.id_sj };
+              });
+              _.map( resDt,(w)=>{ updIdSj(w.key,w.idSj); } );
+              console.log( resDt );
             });
-            _.map( resDt,(w)=>{ updIdSj(w.key,w.idSj); } );
-            console.log( resDt );
-          });
         }, 500);
+      }
+
+      let kyCheckInterval = null;
+
+      function startKyDataChecker() {
+        console.log("Pengecekan berkala dimulai");
+
+        // Bersihkan interval lama jika ada (hindari repetitif bertumpuk)
+        if (kyCheckInterval !== null) {
+          clearInterval(kyCheckInterval);
+        }
+
+        // Jalankan pertama kali segera
+        cekDanAmbilKyData();
+
+        // Jadwalkan eksekusi ulang setiap 10 detik
+        kyCheckInterval = setInterval(() => {
+          cekDanAmbilKyData();
+          console.log("Perubahan di cek!");
+        }, 10000); // 10000 ms = 10 detik
       }
 
       // Jalankan fungsinya
@@ -807,6 +837,7 @@
       }
 
       $(document).ready(() => {
+        startKyDataChecker();
         // renderData(rawData);
 
         $('#searchInput').on('input', () => renderData(rawData));
