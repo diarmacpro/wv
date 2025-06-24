@@ -288,6 +288,8 @@
       $(()=>{
         fbsA = new Fbs(dbA);
         fbsB = new Fbs(dbB);
+
+        cekDanAmbilKyData();
       })
 
       function showSpinner() {
@@ -402,8 +404,9 @@
               data-count="${item.cO}" data-ge="${item.ge}" data-idky="${item.ky}" data-key="${key}">
               <div class="text-gray-800 mb-2 flex justify-between">
                 <div>
-                  <span class="font-bold">${fields.idStock} (${fields.ltrl})</span>
+                  <span class="font-bold">${fields.idStock}</span>
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border">${fields.mkt}</span>${picWh}
+                  <span class="font-bold font-mono ms-1">${item.idSj ? `SJ.${padZero(item.idSj || 0, 5)}` : '' }</span>
                 </div>
                 <div class="py-0 text-sm text-gray-800">${formatDate(item.dt_m || item.dt_c || Date.now())}</div>
               </div>
@@ -420,7 +423,7 @@
               <div class="flex justify-between">
                 <div class="flex flex-wrap gap-1">
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border">${fields.rkkl}</span>
-                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-mono font-medium text-gray-700 border">${item.idSj ? `SJ.${padZero(item.idSj || 0, 5)}` : fields.ltrl }</span>
+                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-mono font-medium text-gray-700 border">${fields.ltrl}</span>
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border capitalize">${fields.ge}</span>
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 border">Qty. ${item.q || '?'}</span>
                 </div>
@@ -472,7 +475,7 @@
           };
       
           const renderAllData = () => {
-            console.log(allData);
+            // console.log(allData);
             const keywords = lastSearch.toLowerCase().split(/\s+/).filter(Boolean);
             const filtered = allData.filter(item => {
               // const isNotDone = item.done !== 1 && item.done !== 2 && item.done !== 3;
@@ -630,6 +633,52 @@
     </div>
   <!-- Script Logic -->
     <script>
+
+      function gtSjByCekKy() {
+        const kyList = allData
+          .filter(item => item.ky !== 0 && (item.idSj == null || !('idSj' in item)))
+          .map(item => item.ky);
+
+        if (kyList.length > 0) {
+          pR('https://cdn.weva.my.id/apix/dataKySj', {
+            ky: kyList.join()
+          }, (err, data) => {
+            console.log(data);
+          });
+        } else {
+          return null;
+        }
+      }
+
+      function updIdSj(keyFbs,idSj){
+        fbsA.upd(`sj-log/${keyFbs}`, null, { idSj }, () => {
+          console.log(`Update Key ${keyFbs} , SJ ${idSj} berhasil!`);
+        });
+      }
+
+      function cekDanAmbilKyData() {
+        console.log("Fungsi Cek Dijalankan!");
+        setTimeout(() => {
+          const lstKy = allData
+          .filter(i => i.ky && (i.idSj == null || !('idSj' in i)))
+          .map(i => i.ky);
+          if (lstKy.length === 0) { console.log('Tidak ada KY yang perlu dicek.'); return; }
+          pR('https://cdn.weva.my.id/apix/dataKySj', { ky: lstKy.join() }, (err, res) => {
+            if (err) { console.error('Gagal mengambil data:', err); return; }
+            const resDt = _.map(res.data, (v) => {
+              const dtObj = _.find(allData, i => i.ky == v.ky);
+              return { key: dtObj?.key || null, ky: v.ky, idSj: v.id_sj };
+            });
+            _.map( resDt,(w)=>{ updIdSj(w.key,w.idSj); } );
+            console.log( resDt );
+          });
+        }, 500);
+      }
+
+      // Jalankan fungsinya
+      // cekDanAmbilKyData();
+
+
       // const rawData = [
       //   { "id_kain": 341, "id_rtr": "?", "id_stock": 3987, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 64, "stts": "g" },
       //   { "id_kain": 341, "id_rtr": "?", "id_stock": 3988, "kol": "C", "lot": "24", "q": "109.30", "rak": "307", "rol": 63, "stts": "g" },
