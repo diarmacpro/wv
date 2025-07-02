@@ -48,13 +48,21 @@
           <div class="flex justify-between items-center">
             <h2 class="text-2xl font-bold text-gray-800"> Data Log <span class="font-normal text-sm text-gray-500 block sm:inline"> Semua List Item Log Barang Gudang </span>
             </h2>
-            <div class="flex flex-col items-end">
-              <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg shadow transition" onclick="toggleModal('myModalDone')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white drop-shadow-sm" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
-                </svg>
-              </button>
-              <div id="statusText" class="text-sm text-gray-600">Total: 000 data</div>
+            <div class="flex justify-end items-center">
+              <div class="flex flex-col items-end">
+                <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg shadow transition" onclick="toggleModal('myModalDone')">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-white drop-shadow-sm" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z" />
+                  </svg>
+                </button>
+                <div id="statusText" class="text-sm text-gray-600">Total: 000 data</div>
+              </div>
+              <div class="flex flex-col items-end ms-3">
+                <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg shadow transition" onclick="toggleModal('trashPopUp')">
+                  <i class="bi bi-trash"></i>
+                </button>
+                <div> </div>
+              </div>
             </div>
           </div>
           <div class="mt-4">
@@ -108,6 +116,47 @@
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
               </svg>
               <p>Memuat data Done...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    
+    <!-- Modal Trash -->
+    <div id="trashPopUp" class="fixed inset-0 z-50 hidden justify-center backdrop-blur-sm bg-black/30">
+      <div class="bg-white w-full max-h-[90vh] m-5 p-0 rounded-2xl shadow-xl mx-5 flex flex-col overflow-hidden">
+        <!-- Header (Tetap di atas) -->
+        <div class="border-b border-gray-200 px-4 pt-4 sticky top-0 bg-white z-10">
+          <div class="flex justify-between items-center">
+            <h3 class="text-gray-600 font-bold">List Trash</h3>
+            <button class="text-gray-400 bg-transparent hover:text-red-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center"
+                    onclick="toggleModal('trashPopUp')">
+              <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+              </svg>
+            </button>
+          </div>
+          <!-- Search Box -->
+          <div class="mt-4 pb-4">
+            <div class="relative">
+              <input type="text" id="searchTrashBox" placeholder="Cari di list Trash"
+              class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50" autocomplete="off"/>
+              <button id="clearSearchTrash" class="absolute right-3 top-3 text-gray-400 hover:text-red-500 text-lg hidden">&times;</button>
+            </div>
+          </div>
+        </div>
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto px-4 pb-4">
+          <div class="grid gap-3 md:grid-cols-2 lg:grid-cols-3 mt-4" id="trashItemList">
+            <div id="loadingTrash" class="text-center text-gray-500 mt-10 col-span-3">
+              <svg class="animate-spin h-6 w-6 mx-auto text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+              </svg>
+              <p>Memuat data Trash...</p>
             </div>
           </div>
         </div>
@@ -374,11 +423,26 @@
         const el = document.getElementById(id);
         el.classList.toggle('hidden');
         el.classList.toggle('flex');
+
+        const hiddenClass = $(`#${id}`).hasClass('hidden');
+
         if (id === 'myModalDone') {
           $('#searchDoneBox').val('');
           $('#clearSearchDone').hide();
           $('#loadingDone').show();
-          setTimeout(renderDoneList, 100);
+          if (!hiddenClass) {
+            setTimeout(renderDoneList, 100);
+            console.log("List Done");
+          }else{
+            console.log("Done None");
+          }
+        }else if (id === 'trashPopUp'){
+          if (!hiddenClass) {
+            gtTrashData();
+            console.log("Trash Pop-up");
+          }else{
+            console.log("Trash None");
+          }
         }
       };
       const highlightText = (text, keywords) => {
@@ -633,6 +697,46 @@
     </div>
   <!-- Script Logic -->
     <script>
+      function gtTrashData(){
+        const dtTrash = _.filter(allData,i=>i.done === 4);
+        const elemenTrash = _.map(dtTrash,(v,k)=>{
+          console.log(v.change_pic);
+            const picWh = v.change_pic ? `&nbsp;&nbsp;<i class="bi bi-arrow-right"></i>&nbsp;&nbsp;<span class="px-1 py-0 border-red-400 bg-red-100 rounded-lg text-sm text-gray-700 border">${v.change_pic}</span>` : '';
+            return `<div class="relative bg-green-50 border-green-300 hover:border-green-400 border rounded-xl shadow-sm p-3 transition-all duration-200 border hover:shadow-md"
+              data-count="${v.cO}" data-ge="${v.ge}" data-idky="${v.ky}" data-key="${v.key}">
+              <div class="text-gray-800 mb-2 flex justify-between">
+                <div>
+                  <span class="font-bold">${v.idStock}</span>
+                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border">${v.mkt}</span>${picWh}
+                  <span class="font-bold font-mono ms-1">${v.idSj ? `SJ.${padZero(v.idSj || 0, 5)}` : '' }</span>
+                </div>
+                <div class="py-0 text-sm text-gray-800">${formatDate(v.dt_m || v.dt_c || Date.now())}</div>
+              </div>
+              <div class="text-gray-800 mb-2 flex justify-between">
+                <div class="text-gray-500">${v.k}</div>
+                <button class="px-1 py-0 rounded-lg text-sm font-medium border transition bg-red-50 text-red-600 border-red-100 hover:bg-red-100"
+                onclick="">
+                ${v.done}
+                </button>
+              </div>
+              <div class="flex justify-between">
+                <div class="flex flex-wrap gap-1">
+                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border">${v.rkkl}</span>
+                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-mono font-medium text-gray-700 border">${v.ltrl}</span>
+                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border capitalize">${v.ge}</span>
+                  <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 border">Qty. ${v.q || '?'}</span>
+                </div>
+                <button class="px-1 py-0 bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 rounded-lg text-sm font-medium border transition"
+                  onclick="">
+                  ${v.done}
+                </button>
+              </div>
+            </div>`
+        }).join('');
+        setTimeout(() => {
+          $('#trashItemList').html(elemenTrash);
+        }, 200);
+      }
 
       function gtSjByCekKy() {
         const kyList = allData
