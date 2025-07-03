@@ -697,6 +697,10 @@
     </div>
   <!-- Script Logic -->
     <script>
+      function btnTrash(act){
+        console.log({act});
+      }
+
       function gtTrashData(){
         const dtTrash = _.filter(allData,i=>i.done === 4);
         const elemenTrash = _.map(dtTrash,(v,k)=>{
@@ -715,8 +719,8 @@
               <div class="text-gray-800 mb-2 flex justify-between">
                 <div class="text-gray-500">${v.k}</div>
                 <button class="px-1 py-0 rounded-lg text-sm font-medium border transition bg-red-50 text-red-600 border-red-100 hover:bg-red-100"
-                onclick="">
-                ${v.done}
+                onclick="btnTrash('hapus-permanen')">
+                Hapus Perm.
                 </button>
               </div>
               <div class="flex justify-between">
@@ -727,8 +731,8 @@
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 border">Qty. ${v.q || '?'}</span>
                 </div>
                 <button class="px-1 py-0 bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 rounded-lg text-sm font-medium border transition"
-                  onclick="">
-                  ${v.done}
+                  onclick="btnTrash('restore')">
+                  Restore
                 </button>
               </div>
             </div>`
