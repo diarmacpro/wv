@@ -101,11 +101,9 @@
           </div>
           <!-- Search Box -->
           <div class="mt-4 pb-4">
-            <div class="flex gap-2 items-center">
+            <div class="relative">
               <input type="text" id="searchDoneBox" placeholder="Cari di list Done" class="w-full pl-4 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50" autocomplete="off"/>
-              <input type="date" id="doneDateFilter" class="border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-gray-50 text-gray-700" />
-              <button id="clearSearchDone" class="text-gray-400 hover:text-red-500 text-lg hidden">&times;</button>
-              <button id="clearDoneDateFilter" class="text-gray-400 hover:text-red-500 text-lg hidden">&times;</button>
+              <button id="clearSearchDone" class="absolute right-3 top-3 text-gray-400 hover:text-red-500 text-lg hidden">&times;</button>
             </div>
           </div>
         </div>
@@ -602,7 +600,6 @@
           const renderDoneList = () => {
             const search = $('#searchDoneBox').val().trim().toLowerCase();
             const keywords = search.split(/\s+/).filter(Boolean);
-            const selectedDate = $('#doneDateFilter').val();
             const filtered = allData.filter(item => {
               const isDone = item.done === 1;
               const cO = parseInt(item.cO) || 0;
@@ -610,21 +607,7 @@
               const rak = getRakFromRkkl(item.rkkl);
               const isWithinRakRange = rak !== null && rak >= rakMin && rak <= rakMax;
               const matchesKeywords = keywords.every(k => [item.k, item.idStock, item.idSj, item.mkt, item.ltrl, item.ge, item.rkkl, item.idKain, item.q, item.ky].join(' ').toLowerCase().includes(k));
-              // Date filter logic
-              let dt_c = item.dt_c ? new Date(item.dt_c) : null;
-              let dt_m = item.dt_m ? new Date(item.dt_m) : null;
-              let maxDate = null;
-              if (dt_c && dt_m) maxDate = dt_c > dt_m ? dt_c : dt_m;
-              else maxDate = dt_c || dt_m;
-              let dateMatch = true;
-              if (selectedDate) {
-                if (!maxDate) dateMatch = false;
-                else {
-                  const itemDate = maxDate.toISOString().slice(0, 10);
-                  dateMatch = itemDate === selectedDate;
-                }
-              }
-              return isDone && geCondition && isWithinRakRange && matchesKeywords && dateMatch;
+              return isDone && geCondition && isWithinRakRange && matchesKeywords;
             });
             const container = $('#doneItemList');
             container.empty();
@@ -706,16 +689,6 @@
             });
             $('#clearSearchDone').on('click', function() {
               $('#searchDoneBox').val('');
-              renderDoneList();
-              $(this).hide();
-            });
-            // Date filter event handlers
-            $('#doneDateFilter').on('input', function() {
-              $('#clearDoneDateFilter').toggle($(this).val().length > 0);
-              renderDoneList();
-            });
-            $('#clearDoneDateFilter').on('click', function() {
-              $('#doneDateFilter').val('');
               renderDoneList();
               $(this).hide();
             });
