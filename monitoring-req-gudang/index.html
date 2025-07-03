@@ -500,6 +500,42 @@
           };
       
           // <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm text-gray-700 border capitalize">${item.cO}</span>
+          /*
+          const setTrashData = (key,status) => {
+            if (!key) return;
+
+            if(status == 5){
+              fbsA.upd(`sj-log/${key}`, null, {
+                done: status,
+                dt_del: stm()
+              }, () => {
+                console.log({
+                done: status,
+                dt_del: stm()
+              });
+                renderAllData();
+                renderDoneList();
+              });
+            }else if(status == 1){
+              fbsA.upd(`sj-log/${key}`, null, {
+                done: status,
+                dt_res: stm()
+              }, () => {
+                console.log({
+                done: status,
+                dt_res: stm()
+              });
+                renderAllData();
+                renderDoneList();
+              });
+            }else{
+              console.log("none");
+            }
+
+
+
+          };
+          */
 
           const cobaSetDel = (key,status) => {
             if (!key) return;
@@ -514,7 +550,7 @@
               renderAllData();
               renderDoneList();
             });
-          }
+          };
 
           const setDoneStatus = (key, status) => {
             if (!key) return;
@@ -697,16 +733,36 @@
     </div>
   <!-- Script Logic -->
     <script>
-      function btnTrash(act){
-        console.log({act});
+      function btnTrash(key,act){
+        if(act == 'hapus-permanen'){
+          console.log("Del Permanen",key);
+          fbsA.gDt(`sj-log/${key}`, '', d => {
+              const data = { keyAwal:key, ...d, done: 5, dt_del: stm() };
+              console.log(data);
+              fbsA.iDtKy('sj-log-trash',data,(e)=>{
+                fbsA.delDt(`/sj-log/${key}`,d=>{
+                  $(`.card-trash[data-key="${key}"]`).remove();
+                })
+              });
+          });
+        }else if(act == 'restore'){
+          fbsA.upd(`sj-log/${key}`, null, {
+              done: 1,
+              dt_res: stm()
+          }, () => {
+              $(`.card-trash[data-key="${key}"]`).remove();
+          })
+        }else{
+          console.log("Nothing");
+        }
       }
 
       function gtTrashData(){
         const dtTrash = _.filter(allData,i=>i.done === 4);
         const elemenTrash = _.map(dtTrash,(v,k)=>{
-          console.log(v.change_pic);
+          // console.log(v.change_pic);
             const picWh = v.change_pic ? `&nbsp;&nbsp;<i class="bi bi-arrow-right"></i>&nbsp;&nbsp;<span class="px-1 py-0 border-red-400 bg-red-100 rounded-lg text-sm text-gray-700 border">${v.change_pic}</span>` : '';
-            return `<div class="relative bg-green-50 border-green-300 hover:border-green-400 border rounded-xl shadow-sm p-3 transition-all duration-200 border hover:shadow-md"
+            return `<div class="relative bg-green-50 border-green-300 hover:border-green-400 border rounded-xl shadow-sm p-3 transition-all duration-200 border hover:shadow-md card-trash"
               data-count="${v.cO}" data-ge="${v.ge}" data-idky="${v.ky}" data-key="${v.key}">
               <div class="text-gray-800 mb-2 flex justify-between">
                 <div>
@@ -719,7 +775,7 @@
               <div class="text-gray-800 mb-2 flex justify-between">
                 <div class="text-gray-500">${v.k}</div>
                 <button class="px-1 py-0 rounded-lg text-sm font-medium border transition bg-red-50 text-red-600 border-red-100 hover:bg-red-100"
-                onclick="btnTrash('hapus-permanen')">
+                onclick="btnTrash('${v.key}','hapus-permanen')">
                 Hapus Perm.
                 </button>
               </div>
@@ -731,7 +787,7 @@
                   <span class="px-1 py-0 border-yellow-400 bg-gray-50 rounded-lg text-sm font-medium text-gray-700 border">Qty. ${v.q || '?'}</span>
                 </div>
                 <button class="px-1 py-0 bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-100 rounded-lg text-sm font-medium border transition"
-                  onclick="btnTrash('restore')">
+                  onclick="btnTrash('${v.key}','restore')">
                   Restore
                 </button>
               </div>
