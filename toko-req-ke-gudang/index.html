@@ -175,6 +175,7 @@
         appId: '1:78765716904:web:fb0033e181ee6dc1ef599d',
         measurementId: 'G-CWXCZV2LCF',
       }, 'logApp');
+      /*
       const appLog = initializeApp({
         apiKey: 'AIzaSyDrDGh1YVtBBIdgNTMS9p_PY24uelBZx-w',
         authDomain: 'stock-wv.firebaseapp.com',
@@ -184,6 +185,16 @@
         messagingSenderId: '463129964774',
         appId: '1:463129964774:web:351332e003a5a88c434b27',
         measurementId: 'G-L8KRSPHTNN',
+      }, 'appLog');
+      */
+      const appLog = initializeApp({
+        apiKey: "AIzaSyAatAGmle6qWEvuaSayT6TV6FDaWvry6xc",
+        authDomain: "stk-wv.firebaseapp.com",
+        databaseURL: "https://stk-wv-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "stk-wv",
+        storageBucket: "stk-wv.appspot.com",
+        messagingSenderId: "1096573680689",
+        appId: "1:1096573680689:web:84d4f2ebb9923dfea66910"
       }, 'appLog');
       const db = getDatabase(app);
       const dbLog = getDatabase(appLog);
